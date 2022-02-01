@@ -19,7 +19,7 @@ clean_data_dir <- here("data", "clean")
 m1316 <- "2013_2015MusselPOPsPAHs_DRAFT_jw.xlsx"
 
 #load dataframe
-m1316_df <- file.path(raw_data_dir, m1316) %>% 
+m1316_df <- here(raw_data_dir, m1316) %>% 
   read_xlsx(sheet = 2)
 
 #### clean-up ####
@@ -44,11 +44,11 @@ substrates <- list("cobble/mud"	=	"cobble_mud",
                    
 #find and replace substrate names
 m1316_df$substrate<- stri_replace_all_regex(m1316_df$substrate,
-                                            pattern=c(names(substrates)),
-                                            replacement=c(unname(substrates)),
-                                            vectorize=FALSE)
+                                            pattern = c(names(substrates)),
+                                            replacement = c(unname(substrates)),
+                                            vectorize = FALSE)
 
 #### write data ####
 
 m1316_df %>% 
-  write_csv(file = file.path(clean_data_dir, "totals_1316.csv"))
+  write_csv(file = here(clean_data_dir, "totals_1316.csv"))
