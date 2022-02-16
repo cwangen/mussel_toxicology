@@ -1,5 +1,4 @@
-##This script performs data cleaning on the 2013-2016 mussel data.
-##To be added and corrected as needed for additional data.
+##This script performs data cleaning on the 2013-2020 mussel data.
 
 #### setup ####
 
@@ -11,44 +10,81 @@ library(janitor)
 library(stringi)
 library(tidyverse)
 
-# set directories for raw and soon to be cleaned data
+#set directories for raw and soon to be cleaned data
 raw_data_dir <- here("data", "raw")
 clean_data_dir <- here("data", "clean")
 
 #get excel file name
-m1316 <- "2013_2015MusselPOPsPAHs_DRAFT_jw.xlsx"
+mussel <- "2013_2020MusselPOPsPAHs_20220209.xlsx"
 
-#load dataframe
-m1316_df <- here(raw_data_dir, m1316) %>% 
+##load dataframes
+#PCB and PBDE totals
+p_df <- here(raw_data_dir, mussel) %>%
+  read_xlsx(sheet = 3)
+#lipid totals
+lipids_df <- here(raw_data_dir, mussel) %>%
   read_xlsx(sheet = 2)
+lipids_df <- subset(lipids_df, Analyte == "lipids")
+#combine to one dataframe
+mussel_df <- rbind(p_df, lipids_df)
+
 
 #### clean-up ####
 
 #clean column names
-m1316_df <- clean_names(m1316_df)
+mussel_df <- clean_names(mussel_df)
+
+#get parentheses out of substrates to avoid escape
+mussel_df$substrate <- gsub("[()]", "", mussel_df$substrate)
 
 #list for substrate name changes (using named list, for easy changing if needed)
-substrates <- list("cobble/mud"	=	"cobble_mud",
-                   "cobble/sand"	=	"cobble_sad",
-                   "Cobble-gravel mix"	=	"cobble_gravel",
-                   "Cobble-gravel mix (with sand)"	=	"cobble_gravel_sand",
-                   "Cobble-gravel mix (with underlying sand)"	=	"cobble_gravel_sand",
+substrates <- list("Cobble-gravel mix with sand"	=	"cobble_gravel_sand",
+                   "Cobble-gravel mix with underlying sand"	=	"cobble_gravel_sand",
+                   "Mud, silt cobble below"	=	"cobble_mud_silt",
+                   "Bedrock, hardpan" = "bedrock_hardpan",
                    "Cobble-gravel mix; Sand-gravel mix"	=	"cobble_gravel_sand",
-                   "Mud, silt"	=	"mud_silt",
-                   "Mud, silt (cobble below)"	=	"cobble_mud_silt",
-                   "sand/mud"	=	"mud_sand",
+                   "Cobble-gravel mix, Sand-gravel mix"	=	"cobble_gravel_sand",
+                   "cobble/mud"	=	"cobble_mud",
+                   "cobble/sand"	=	"cobble_sad",
+                   "N/A" = "NA",
+                   "Riprap rock" = "riprap",
+                   "Sand-gravel mix, sand, san-mud mix" = "gravel_mud_sand",
+                   "Sand-mud and clay mix"	=	"clay_mud_sand",
                    "Sand-cobble mix"	=	"cobble_sand",
                    "Sand-gravel mix"	=	"gravel_sand",
-                   "Sand-mud and clay mix"	=	"clay_mud_sand",
-                   "Sand-mud mix"	=	"mud_sand")
+                   "Sand-mud mix"	=	"mud_sand",
+                   "sand/mud"	=	"mud_sand",
+                   "Sand" = "sand",
+                   "Cobble-gravel mix"	=	"cobble_gravel",
+                   "Mud, silt"	=	"mud_silt"
+                   )
                    
 #find and replace substrate names
-m1316_df$substrate<- stri_replace_all_regex(m1316_df$substrate,
+mussel_df$substrate <- stri_replace_all_regex(mussel_df$substrate,
                                             pattern = c(names(substrates)),
                                             replacement = c(unname(substrates)),
                                             vectorize = FALSE)
+ 
+#insert Penn Cove lat and lon
+mussel_df$latitude[is.na(mussel_df$latitude)] <-  48.218626
+mussel_df$longitude[is.na(mussel_df$longitude)] <- -122.707972
+
+#### create additional columns ####
+
+#add numeric ID column for each sample
+mussel_df <- mussel_df %>%
+  group_by(year, sample_id) %>%
+  dplyr::mutate(ID = cur_group_id())
+
+#add lipid_weight (wet weight/lipids) column
+mussel_df["lipid_weight"] <- NA
+mussel_df <- mussel_df %>%
+  group_by(ID) %>%
+  mutate(lipid_weight = wet_value / wet_value[analyte == "lipids"])
+
+#add column with days sample spent in field
+mussel_df$time <- difftime(mussel_df$retrieval_date, mussel_df$deployment_date)
 
 #### write data ####
-
-m1316_df %>% 
-  write_csv(file = here(clean_data_dir, "totals_1316.csv"))
+mussel_df %>%
+  write_csv(file = here(clean_data_dir, "totals_all.csv"))
