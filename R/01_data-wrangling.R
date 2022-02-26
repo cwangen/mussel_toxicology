@@ -64,6 +64,24 @@ mussel_df$substrate <- stri_replace_all_regex(mussel_df$substrate,
                                             pattern = c(names(substrates)),
                                             replacement = c(unname(substrates)),
                                             vectorize = FALSE)
+
+#list for site_name fixes (using named list, for easy changing if needed)
+sitenames <- list("Bellingham Bay, Little Squalicum Crk" = "Bellingham Bay, Little Squalicum Creek",
+                  "Cavalero Beach Co. Park" = "Calvalero Beach",
+                  "Cherry Point North" = "Cherry Point",
+                  "Cherry Pt Aq Res, 1 Alcoa-BP" = "Cherry Point",
+                  "Gig Harbor - Boat Launch" = "Gig Harbor Boat Launch",
+                  "Illahee Crk" = "Illahee Creek",
+                  "Manchester, Stormwater Outfall" = "Manchester, SWO",
+                  "Shilshole" = "Shilshole Bay"
+)
+
+#Fixing site_name
+mussel_df$site_name <- stri_replace_all_regex(mussel_df$site_name,
+                                              pattern = c(names(sitenames)),
+                                              replacement = c(unname(sitenames)),
+                                              vectorize = FALSE)
+
  
 #insert Penn Cove lat and lon
 mussel_df$latitude[is.na(mussel_df$latitude)] <-  48.218626
