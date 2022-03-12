@@ -159,7 +159,7 @@ mapPS <- readRDS("./R/mapPS.rds")
 
 ## Sort Data
 musselabs_df <- mussel_df
-musselabs_df$lipid_weight <- abs(musselabs_df$lipid_weight)
+musselabs_df$dry_value <- abs(musselabs_df$dry_value)
 
 BDE13 <- musselabs_df %>%
   filter(musselabs_df$analyte == "SumPBDEs11", musselabs_df$year == "2013")
@@ -190,7 +190,7 @@ BDE13m <- ggmap(mapPS) +
     aes(
       x = longitude,
       y = latitude,
-      color = lipid_weight
+      color = dry_value
     )
   ) +
   scale_colour_gradientn(
@@ -207,7 +207,7 @@ BDE16m <- ggmap(mapPS) +
     aes(
       x = longitude,
       y = latitude,
-      color = lipid_weight
+      color = dry_value
     )
   ) +
   scale_colour_gradientn(
@@ -224,7 +224,7 @@ BDE18m <- ggmap(mapPS) +
     aes(
       x = longitude,
       y = latitude,
-      color = lipid_weight
+      color = dry_value
     )
   ) +
   scale_colour_gradientn(
@@ -241,7 +241,7 @@ BDE20m <- ggmap(mapPS) +
     aes(
       x = longitude,
       y = latitude,
-      color = lipid_weight
+      color = dry_value
     )
   ) +
   scale_colour_gradientn(
@@ -271,7 +271,7 @@ CB13m <- ggmap(mapPS) +
     aes(
       x = longitude,
       y = latitude,
-      color = lipid_weight
+      color = dry_value
     )
   ) +
   scale_colour_gradientn(
@@ -288,7 +288,7 @@ CB16m <- ggmap(mapPS) +
     aes(
       x = longitude,
       y = latitude,
-      color = lipid_weight
+      color = dry_value
     )
   ) +
   scale_colour_gradientn(
@@ -305,7 +305,7 @@ CB18m <- ggmap(mapPS) +
     aes(
       x = longitude,
       y = latitude,
-      color = lipid_weight
+      color = dry_value
     )
   ) +
   scale_colour_gradientn(
@@ -322,7 +322,7 @@ CB20m <- ggmap(mapPS) +
     aes(
       x = longitude,
       y = latitude,
-      color = lipid_weight
+      color = dry_value
     )
   ) +
   scale_colour_gradientn(
@@ -372,5 +372,5 @@ mussel_PCB <- subset(
 )
 
 # histograms combined years
-hist(mussel_PDBE$lipid_weight)
-hist(mussel_PCB$lipid_weight)
+hist(mussel_PDBE$dry_value)
+hist(mussel_PCB$dry_value)

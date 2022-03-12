@@ -15,18 +15,25 @@ raw_data_dir <- here("data", "raw")
 clean_data_dir <- here("data", "clean")
 
 #get excel file name
-mussel <- "2013_2020MusselPOPsPAHs_20220209.xlsx"
+mussel <- "2013_2020MusselPOPsPAHs_withMean%IS.xlsx"
 
-##load dataframes
-#PCB and PBDE totals
-p_df <- here(raw_data_dir, mussel) %>%
-  read_xlsx(sheet = 3)
+##load excel sheet
+mussel_df <- here(raw_data_dir, mussel) %>%
+  read_xlsx(sheet = 1)
 #lipid totals
 lipids_df <- here(raw_data_dir, mussel) %>%
-  read_xlsx(sheet = 2)
+  read_xlsx(sheet = 1)
 lipids_df <- subset(lipids_df, Analyte == "lipids")
+#PBDEs totals
+PBDE_df <- here(raw_data_dir, mussel) %>%
+  read_xlsx(sheet = 1)
+PBDE_df <- subset(PBDE_df, Analyte == "SumPBDEs11")
+#lipid totals
+PCB_df <- here(raw_data_dir, mussel) %>%
+  read_xlsx(sheet = 1)
+PCB_df <- subset(PCB_df, Analyte == "SubPCBs2x17")
 #combine to one dataframe
-mussel_df <- rbind(p_df, lipids_df)
+mussel_df <- rbind(lipids_df, PCB_df,PBDE_df)
 
 
 #### clean-up ####
