@@ -172,13 +172,13 @@ BDE20 <- musselabs_df %>%
   filter(musselabs_df$analyte == "SumPBDEs11", musselabs_df$year == "2020")
 
 CB13 <- musselabs_df %>%
-  filter(musselabs_df$analyte == "SumPCBs11", musselabs_df$year == "2013")
+  filter(musselabs_df$analyte == "SumPCBs2x17", musselabs_df$year == "2013")
 CB16 <- musselabs_df %>%
-  filter(musselabs_df$analyte == "SumPCBs11", musselabs_df$year == "2016")
+  filter(musselabs_df$analyte == "SumPCBs2x17", musselabs_df$year == "2016")
 CB18 <- musselabs_df %>%
-  filter(musselabs_df$analyte == "SumPCBs11", musselabs_df$year == "2018")
+  filter(musselabs_df$analyte == "SumPCBs2x17", musselabs_df$year == "2018")
 CB20 <- musselabs_df %>%
-  filter(musselabs_df$analyte == "SumPCBs11", musselabs_df$year == "2020")
+  filter(musselabs_df$analyte == "SumPCBs2x17", musselabs_df$year == "2020")
 
 ## PBDE Maps
 
@@ -195,7 +195,7 @@ BDE13m <- ggmap(mapPS) +
   ) +
   scale_colour_gradientn(
     colours = c("yellow", "red"),
-    limits = c(0, 7)
+    limits = c(0, 50)
   ) +
   ggtitle("2013")
 
@@ -212,7 +212,7 @@ BDE16m <- ggmap(mapPS) +
   ) +
   scale_colour_gradientn(
     colours = c("yellow", "red"),
-    limits = c(0, 7)
+    limits = c(0, 50)
   ) +
   ggtitle("2016")
 
@@ -229,7 +229,7 @@ BDE18m <- ggmap(mapPS) +
   ) +
   scale_colour_gradientn(
     colours = c("yellow", "red"),
-    limits = c(0, 7)
+    limits = c(0, 50)
   ) +
   ggtitle("2018")
 
@@ -246,7 +246,7 @@ BDE20m <- ggmap(mapPS) +
   ) +
   scale_colour_gradientn(
     colours = c("yellow", "red"),
-    limits = c(0, 7)
+    limits = c(0, 50)
   ) +
   ggtitle("2020")
 
@@ -258,7 +258,7 @@ allPBDE <- ggarrange(BDE13m, BDE16m, BDE18m, BDE20m,
 annotate_figure(allPBDE, top = text_grob("PBDEs over time",
   color = "black",
   face = "bold",
-  size = 14
+  size = 14 
 ))
 
 ## PCB Maps
@@ -276,7 +276,7 @@ CB13m <- ggmap(mapPS) +
   ) +
   scale_colour_gradientn(
     colours = c("yellow", "red"),
-    limits = c(0, 55)
+    limits = c(0, 285)
   ) +
   ggtitle("2013")
 
@@ -293,7 +293,7 @@ CB16m <- ggmap(mapPS) +
   ) +
   scale_colour_gradientn(
     colours = c("yellow", "red"),
-    limits = c(0, 55)
+    limits = c(0, 285)
   ) +
   ggtitle("2016")
 
@@ -310,7 +310,7 @@ CB18m <- ggmap(mapPS) +
   ) +
   scale_colour_gradientn(
     colours = c("yellow", "red"),
-    limits = c(0, 55)
+    limits = c(0, 285)
   ) +
   ggtitle("2018")
 
@@ -327,7 +327,7 @@ CB20m <- ggmap(mapPS) +
   ) +
   scale_colour_gradientn(
     colours = c("yellow", "red"),
-    limits = c(0, 55)
+    limits = c(0, 285)
   ) +
   ggtitle("2020")
 
