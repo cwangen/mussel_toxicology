@@ -299,7 +299,7 @@ CB16m <- ggmap(mapPS) +
 
 CB18m <- ggmap(mapPS) +
   geom_point(
-    data = CB13,
+    data = CB18,
     size = I(1.5),
     alpha = 0.4,
     aes(
@@ -316,7 +316,7 @@ CB18m <- ggmap(mapPS) +
 
 CB20m <- ggmap(mapPS) +
   geom_point(
-    data = CB13,
+    data = CB20,
     size = I(1.5),
     alpha = 0.4,
     aes(
@@ -336,7 +336,7 @@ CB20m <- ggmap(mapPS) +
 allPCB <- ggarrange(CB13m, CB16m, CB18m, CB20m,
   ncol = 2, nrow = 2
 )
-annotate_figure(allPBDE, top = text_grob("PCBs over time",
+annotate_figure(allPCB, top = text_grob("PCBs over time",
   color = "black",
   face = "bold",
   size = 14
