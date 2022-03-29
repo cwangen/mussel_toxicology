@@ -26,7 +26,7 @@ mussel_df <- read_csv(here(clean_data_dir, totals), show_col_types = FALSE)
 
 #### reorganization as needed ####
 
-# remove rows with missing wet_value (there is only one)
+# remove rows with missing wet_value
 mussel_exp <- mussel_df[!is.na(mussel_df$wet_value), ]
 
 #### tables and numbers ####
@@ -154,8 +154,8 @@ barlong <- barplot(longtable,
 #                force = TRUE)
 
 # Load Puget Sound map
-mapPS <- readRDS("./R/mapPS.rds")
-
+mapPS <- readRDS("mapPS.rds")
+# mapPS <- readRDS("./R/mapPS.rds")
 
 ## Sort Data
 musselabs_df <- mussel_df
@@ -179,6 +179,17 @@ CB18 <- musselabs_df %>%
   filter(musselabs_df$analyte == "SumPCBs2x17", musselabs_df$year == "2018")
 CB20 <- musselabs_df %>%
   filter(musselabs_df$analyte == "SumPCBs2x17", musselabs_df$year == "2020")
+
+AH13 <- musselabs_df %>%
+  filter(musselabs_df$analyte == "SumPAHs16", musselabs_df$year == "2013")
+
+AH16 <- musselabs_df %>%
+  filter(musselabs_df$analyte == "SumPAHs16", musselabs_df$year == "2016")
+AH18 <- musselabs_df %>%
+  filter(musselabs_df$analyte == "SumPAHs16", musselabs_df$year == "2018")
+AH20 <- musselabs_df %>%
+  filter(musselabs_df$analyte == "SumPAHs16", musselabs_df$year == "2020")
+
 
 ## PBDE Maps
 
@@ -343,6 +354,87 @@ annotate_figure(allPCB, top = text_grob("PCBs over time",
 ))
 
 
+## PAH Maps
+
+AH13m <- ggmap(mapPS) +
+  geom_point(
+    data = AH13,
+    size = I(1.5),
+    alpha = 0.4,
+    aes(
+      x = longitude,
+      y = latitude,
+      color = dry_value
+    )
+  ) +
+  scale_colour_gradientn(
+    colours = c("yellow", "red"),
+    limits = c(0, 5000)
+  ) +
+  ggtitle("2013")
+
+AH16m <- ggmap(mapPS) +
+  geom_point(
+    data = AH16,
+    size = I(1.5),
+    alpha = 0.4,
+    aes(
+      x = longitude,
+      y = latitude,
+      color = dry_value
+    )
+  ) +
+  scale_colour_gradientn(
+    colours = c("yellow", "red"),
+    limits = c(0, 5000)
+  ) +
+  ggtitle("2016")
+
+AH18m <- ggmap(mapPS) +
+  geom_point(
+    data = AH18,
+    size = I(1.5),
+    alpha = 0.4,
+    aes(
+      x = longitude,
+      y = latitude,
+      color = dry_value
+    )
+  ) +
+  scale_colour_gradientn(
+    colours = c("yellow", "red"),
+    limits = c(0, 5000)
+  ) +
+  ggtitle("2018")
+
+AH20m <- ggmap(mapPS) +
+  geom_point(
+    data = AH20,
+    size = I(1.5),
+    alpha = 0.4,
+    aes(
+      x = longitude,
+      y = latitude,
+      color = dry_value
+    )
+  ) +
+  scale_colour_gradientn(
+    colours = c("yellow", "red"),
+    limits = c(0, 5000)
+  ) +
+  ggtitle("2020")
+
+# all plotted
+
+allPAH <- ggarrange(AH13m, AH16m, AH18m, AH20m,
+                    ncol = 2, nrow = 2
+)
+annotate_figure(allPAH, top = text_grob("PAHs over time",
+                                        color = "black",
+                                        face = "bold",
+                                        size = 14 
+))
+
 
 # map of all sample locations
 mussel_l <- mussel_df %>% filter(mussel_df$analyte == "lipids")
@@ -371,6 +463,13 @@ mussel_PCB <- subset(
   mussel_exp$analyte == "SumPCBs2x17"
 )
 
+mussel_PAH <- subset(
+  mussel_exp,
+  mussel_exp$analyte == "SumPAHs16"
+)
+
+
 # histograms combined years
 hist(mussel_PDBE$dry_value)
 hist(mussel_PCB$dry_value)
+hist(mussel_PAH$dry_value)
