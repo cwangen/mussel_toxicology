@@ -11,8 +11,8 @@
 # Example code in package build process
 *-Ex.R
 
-# Output files from R CMD build
 /*.tar.gz
+# Output files from R CMD build
 
 # Output files from R CMD check
 /*.Rcheck/
@@ -23,8 +23,15 @@
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+
+#Outputs in progress
 *.png
 *.pdf
+*.Rmd
+*.nb.html
+
+#Temporary file created by Notepad++ when editing this file
+*.bak
 
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
 .httr-oauth
@@ -39,3 +46,6 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+#Allow outputs folder
+!outputs/**
