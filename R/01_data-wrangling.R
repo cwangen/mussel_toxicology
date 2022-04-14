@@ -15,7 +15,7 @@ raw_data_dir <- here("data", "raw")
 clean_data_dir <- here("data", "clean")
 
 #get excel file name
-mussel <- "2013_2020MusselPOPsPAHs_MeanIS_Sums_repsWithCounty.xlsx"
+mussel <- "2013-20MusselCagesPOPsPAHs_Cnty_WRIA_LIO_Coverages.xlsx.xlsx"
 
 ##load excel sheet
 mussel_df <- here(raw_data_dir, mussel) %>%
