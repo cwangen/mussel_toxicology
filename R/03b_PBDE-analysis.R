@@ -107,26 +107,32 @@ wria_mean <- ddply(PB_df, c("wria_nr","year"), summarise,
 
 #### raincloud plots ####
 ##over years
+pdf("PBDEs_Over_Years.pdf")
 PB_df %>% 
   ggplot(aes(x = year, y = log(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)
-
-## over LIO
+  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggtitle("PBDEs Across Years")
+dev.off()
+## over LIOs
+pdf("PBDEs_Over_LIOs.pdf")
 PB_df %>% 
   ggplot(aes(x = lio_areas, y = log(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)
-
+  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggtitle("PBDEs Across LIOs")
+dev.off()
 ##over wria_nr
+pdf("PBDEs_Over_WRIAs.pdf")
 PB_df %>% 
   ggplot(aes(x = wria_nr, y = log(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)
-
+  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggtitle("PBDEs Across WRIAs")
+dev.off()
 #### WRIA plot loop ####
 plot_list = list()
 for (i in unique(PB_df$wria_nr)){
