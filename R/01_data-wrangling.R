@@ -9,11 +9,7 @@ library(writexl)
 library(janitor)
 library(stringi)
 library(tidyverse)
-library(conflicted)
-
-#avoid conflict
-conflict_prefer("here", "here")
-conflict_prefer("mutate", "dplyr")
+library(dplyr)
 
 #set directories for raw and soon to be cleaned data
 raw_data_dir <- here("data", "raw")

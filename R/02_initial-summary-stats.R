@@ -14,9 +14,7 @@ library(RANN)
 library(geosphere)
 library(stringi)
 library(ggpubr)
-
-conflict_prefer("here", "here")
-conflict_prefer("mutate", "dplyr")
+library(dplyr)
 
 # set directories
 clean_data_dir <- here("data", "clean")

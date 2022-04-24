@@ -7,12 +7,7 @@ library(lme4)
 library(RLRsim)
 library(ggdist)
 library(tidyquant)
-library(plyr)
-
-
-#### Create Dataframes ####
-conflict_prefer("here", "here")
-conflict_prefer("mutate", "dplyr")
+library(dplyr)
 
 # set directories
 clean_data_dir <- here("data", "clean")
@@ -136,13 +131,12 @@ PB_df %>%
 plot_list = list()
 for (i in unique(PB_df$wria_nr)){
   wria_subset <- PB_df[PB_df$wria_nr==i,]
-  main = paste("WRIA #",i)
   p = wria_subset %>%
     ggplot(aes(x = year, y = log(dry_value))) +
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
     ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1) +
-    ggtitle(paste("WRIA #",i))
+    ggtitle(paste("PBDEs - WRIA #",i))
   plot_list[[i]] = p
 }
 #end plot loop
@@ -158,13 +152,12 @@ dev.off()
 plot_list = list()
 for (i in unique(PB_df$lio_areas)){
   wria_subset <- PB_df[PB_df$lio_areas==i,]
-  main = paste("WRIA #",i)
   p = wria_subset %>%
     ggplot(aes(x = year, y = log(dry_value))) +
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
     ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1) +
-    ggtitle(paste("LOI -",i))
+    ggtitle(paste("PBDEs - LIO -",i))
   plot_list[[i]] = p
 }
 #end plot loop
