@@ -9,6 +9,11 @@ library(writexl)
 library(janitor)
 library(stringi)
 library(tidyverse)
+library(conflicted)
+
+#avoid conflict
+conflict_prefer("here", "here")
+conflict_prefer("mutate", "dplyr")
 
 #set directories for raw and soon to be cleaned data
 raw_data_dir <- here("data", "raw")
@@ -41,6 +46,8 @@ mussel_df <- rbind(lipids_df, PCB_df,PBDE_df,PAH_df)
 
 
 #### clean-up ####
+
+#absolute value of wet_value for now
 
 #clean column names
 mussel_df <- clean_names(mussel_df)
@@ -110,6 +117,9 @@ mussel_df["lipid_weight"] <- NA
 mussel_df <- mussel_df %>%
   group_by(ID) %>%
   mutate(lipid_weight = wet_value / wet_value[analyte == "lipids"])
+
+#abs of dry value for now
+mussel_df$dry_value <- abs(mussel_df$dry_value)
 
 #add column with days sample spent in field
 mussel_df$time <- difftime(mussel_df$retrieval_date, mussel_df$deployment_date)
