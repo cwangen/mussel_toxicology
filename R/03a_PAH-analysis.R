@@ -56,15 +56,10 @@ PA_df <- PA_df[complete.cases(PA_df),]
 
 #### Fit model with RE for lat and lon and plots ####
 PA_LMM <- lmer(log(dry_value) ~
-                 -1 +
-                 time +
                  year +
+                 time +
                  mean_is_au +
-                 #county_name +
-                # wria_nr +
                year:lio_areas +
-                # lio_areas+
-                 #(1|latitude)
                  (1|longitude),
                data = PA_df)
 

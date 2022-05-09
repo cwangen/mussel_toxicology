@@ -56,15 +56,10 @@ PB_df <- PB_df[complete.cases(PB_df),]
 
 #### Fit model with RE for lat and lon and plots ####
 PB_LMM <- lmer(log(dry_value) ~
-                 -1 +
                  time +
                  year +
-                 mean_is_au +
-                 #county_name +
-                 # wria_nr +
+                 mean_is_au ++
                  year:lio_areas +
-                 # lio_areas+
-                 #(1|latitude)
                  (1|longitude),
                data = PB_df)
 
