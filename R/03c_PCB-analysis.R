@@ -171,6 +171,17 @@ for (i in unique(PC_df$lio_areas)){
 }
 dev.off()
 
+#### 2020 only plots ####
+PC20_df <- PC_df %>% filter(PC_df$year == 2020)
+pdf("2020_PCBs_Over_WRIAs.pdf")
+PC20_df %>% 
+  ggplot(aes(x = wria_nr, y = log(dry_value))) +
+  ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+  geom_boxplot(width = .1, outlier.shape = NA) +
+  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggtitle("2020 - PCBs Across WRIAs")
+dev.off()
+
 
 #### anova ####
 PC_aov <- aov(PC_df$dry_value ~ PC_df$wria_nr, data = PC_df)

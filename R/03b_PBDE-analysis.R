@@ -170,6 +170,18 @@ for (i in unique(PB_df$lio_areas)){
 }
 dev.off()
 
+#### 2020 only plots ####
+PB20_df <- PB_df %>% filter(PB_df$year == 2020)
+pdf("2020_PBDEs_Over_WRIAs.pdf")
+PB20_df %>% 
+  ggplot(aes(x = wria_nr, y = log(dry_value))) +
+  ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+  geom_boxplot(width = .1, outlier.shape = NA) +
+  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggtitle("2020 - PBDEs Across WRIAs")
+dev.off()
+
+
 
 #### anova ####
 PB_aov <- aov(PB_df$dry_value ~ PB_df$wria_nr, data = PB_df)
