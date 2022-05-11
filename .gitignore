@@ -49,3 +49,7 @@ vignettes/*.pdf
 
 #Allow outputs folder
 !outputs/**
+
+#Allow reports folder
+!reports/*.Rmd
+!reports/*.pdf
