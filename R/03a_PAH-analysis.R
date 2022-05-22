@@ -64,17 +64,19 @@ PA_LMM <- lmer(log(dry_value) ~
                data = PA_df)
 
 
-## residuals vs fitted
-plot(fitted(PA_LMM), residuals(PA_LMM), las = 1, pch = 1,
-     xlab = "Fitted", ylab = "Residuals",
-     main = "Main")
-abline(h=0, lty = "dashed")
 
 #### QQ plots ####
 ## set plot area
 par(mai = c(0.9, 0.9, 0.6, 0.1),
     omi = c(0, 0, 0, 0),
-    mfrow = c(1,2), cex.lab = 1.2)
+    mfrow = c(1,3), cex.lab = 1.2)
+
+## residuals vs fitted
+plot(fitted(PA_LMM), residuals(PA_LMM), las = 1, pch = 1,
+     xlab = "Fitted", ylab = "Residuals",
+     main = "Residuals vs Fitted")
+abline(h=0, lty = "dashed")
+
 
 ## residuals
 qqnorm(residuals(PA_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
@@ -108,6 +110,9 @@ PA_df %>%
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
   ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  theme(axis.text.x=element_text(angle=270,hjust=1)) +
+  xlab("Year") +
+  ylab("log(dry value)")+
   ggtitle("PAHs Across Years")
 dev.off()
 ## over LIOs
@@ -116,7 +121,9 @@ PA_df %>%
   ggplot(aes(x = lio_areas, y = log(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+  theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
+  xlab("LIO Area") +
+  ylab("log(dry value)")+
   ggtitle("PAHs Across LIOs")
 dev.off()
 ##over wria_nr
@@ -126,6 +133,9 @@ PA_df %>%
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
   ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+ theme(axis.text.x=element_text(angle=270,hjust=1)) +
+ xlab("WRIA") +
+ ylab("log(dry value)")+
   ggtitle("PAHs Across WRIAs")
 dev.off()
 #### WRIA plot loop ####
@@ -137,7 +147,10 @@ for (i in unique(PA_df$wria_nr)){
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
     ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1) +
-   ggtitle(paste("PAHs - WRIA #",i))
+   ggtitle(paste("PAHs - WRIA #",i)) +
+   # theme(axis.text.x=element_text(angle=270,hjust=1)) +
+    xlab("Year") +
+    ylab("log(dry value)")
   plot_list[[i]] = p
                                 }
 #end plot loop
@@ -158,6 +171,9 @@ for (i in unique(PA_df$lio_areas)){
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
     ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1) +
+    theme(axis.text.x=element_text(angle=270,hjust=1)) +
+    xlab("LIO") +
+    ylab("log(dry value)")+
     ggtitle(paste("PAHs - LIO -",i))
   plot_list[[i]] = p
 }
@@ -178,6 +194,9 @@ PA20_df %>%
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
   ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  theme(axis.text.x=element_text(angle=270,hjust=1)) +
+  xlab("WRIA") +
+  ylab("log(dry value)")+
   ggtitle("2020 - PAHs Across WRIAs")
 dev.off()
 
