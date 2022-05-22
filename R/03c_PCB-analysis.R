@@ -106,37 +106,37 @@ wria_mean <- ddply(PC_df, c("wria_nr","year"), summarise,
 ##over years
 pdf("PCBs_Over_Years.pdf")
 PC_df %>% 
-  ggplot(aes(x = year, y = log(dry_value))) +
+  ggplot(aes(x = year, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)
 theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("Year") +
-  ylab("log(dry value)")+
+  ylab("log10(dry value)")+
 ggtitle("PCBs Across Years")
 dev.off()
 ## over LIO
 pdf("PCBs_Over_LIOs.pdf")
 PC_df %>% 
-  ggplot(aes(x = lio_areas, y = log(dry_value))) +
+  ggplot(aes(x = lio_areas, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
   theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
   xlab("LIO Area") +
-  ylab("log(dry value)")+
+  ylab("log10(dry value)")+
 ggtitle("PCBs Across LIOs")
 dev.off()
 ##over wria_nr
 pdf("PCBs_Over_WRIAs.pdf")
 PC_df %>% 
-  ggplot(aes(x = wria_nr, y = log(dry_value))) +
+  ggplot(aes(x = wria_nr, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1) +
+  ggdist::stat_dots(side = "left", dotsize = .0.5, justification = 1.1, binwidth = .1) +
   theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("WRIA") +
-  ylab("log(dry value)")+
+  ylab("log10(dry value)")+
 ggtitle("PCBs Across WRIAs")
 dev.off()
 #### WRIA plot loop ####
@@ -145,13 +145,13 @@ for (i in unique(PC_df$wria_nr)){
   wria_subset <- PC_df[PC_df$wria_nr==i,]
   main = paste("WRIA #",i)
   p = wria_subset %>%
-    ggplot(aes(x = year, y = log(dry_value))) +
+    ggplot(aes(x = year, y = log10(dry_value))) +
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
-    ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1) +
+    ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
     ggtitle(paste("PCBs - WRIA #",i)) +
     xlab("Year") +
-    ylab("log(dry value)")
+    ylab("log10(dry value)")
   plot_list[[i]] = p
 }
 #end plot loop
@@ -168,13 +168,13 @@ plot_list = list()
 for (i in unique(PC_df$lio_areas)){
   wria_subset <- PC_df[PC_df$lio_areas==i,]
   p = wria_subset %>%
-    ggplot(aes(x = year, y = log(dry_value))) +
+    ggplot(aes(x = year, y = log10(dry_value))) +
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
-    ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1) +
+    ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
     theme(axis.text.x=element_text(angle=270,hjust=1)) +
     xlab("LIO") +
-    ylab("log(dry value)")+
+    ylab("log10(dry value)")+
     ggtitle(paste("PCBs - LIO -",i))
   plot_list[[i]] = p
 }
@@ -191,13 +191,13 @@ dev.off()
 PC20_df <- PC_df %>% filter(PC_df$year == 2020)
 pdf("2020_PCBs_Over_WRIAs.pdf")
 PC20_df %>% 
-  ggplot(aes(x = wria_nr, y = log(dry_value))) +
+  ggplot(aes(x = wria_nr, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)
                     theme(axis.text.x=element_text(angle=270,hjust=1)) +
                       xlab("WRIA") +
-                      ylab("log(dry value)")+
+                      ylab("log10(dry value)")+
   ggtitle("2020 - PCBs Across WRIAs")
 dev.off()
 

@@ -106,37 +106,37 @@ wria_mean <- ddply(PB_df, c("wria_nr","year"), summarise,
 ##over years
 pdf("PBDEs_Over_Years.pdf")
 PB_df %>% 
-  ggplot(aes(x = year, y = log(dry_value))) +
+  ggplot(aes(x = year, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
   theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("Year") +
-  ylab("log(dry value)")+
+  ylab("log10(dry value)")+
   ggtitle("PBDEs Across Years")
 dev.off()
 ## over LIOs
 pdf("PBDEs_Over_LIOs.pdf")
 PB_df %>% 
-  ggplot(aes(x = lio_areas, y = log(dry_value))) +
+  ggplot(aes(x = lio_areas, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
    theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
   xlab("LIO Area") +
-  ylab("log(dry value)")+
+  ylab("log10(dry value)")+
   ggtitle("PBDEs Across LIOs")
 dev.off()
 ##over wria_nr
 pdf("PBDEs_Over_WRIAs.pdf")
 PB_df %>% 
-  ggplot(aes(x = wria_nr, y = log(dry_value))) +
+  ggplot(aes(x = wria_nr, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1)+
   theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("WRIA") +
-  ylab("log(dry value)")+
+  ylab("log10(dry value)")+
   ggtitle("PBDEs Across WRIAs")
 dev.off()
 #### WRIA plot loop ####
@@ -144,13 +144,13 @@ plot_list = list()
 for (i in unique(PB_df$wria_nr)){
   wria_subset <- PB_df[PB_df$wria_nr==i,]
   p = wria_subset %>%
-    ggplot(aes(x = year, y = log(dry_value))) +
+    ggplot(aes(x = year, y = log10(dry_value))) +
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
-    ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1) +
+    ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
     ggtitle(paste("PBDEs - WRIA #",i)) +
     xlab("Year") +
-    ylab("log(dry value)")
+    ylab("log10(dry value)")
   plot_list[[i]] = p
 }
 #end plot loop
@@ -167,13 +167,13 @@ plot_list = list()
 for (i in unique(PB_df$lio_areas)){
   wria_subset <- PB_df[PB_df$lio_areas==i,]
   p = wria_subset %>%
-    ggplot(aes(x = year, y = log(dry_value))) +
+    ggplot(aes(x = year, y = log10(dry_value))) +
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
-    ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1) +
+    ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
     theme(axis.text.x=element_text(angle=270,hjust=1)) +
     xlab("LIO") +
-    ylab("log(dry value)")+
+    ylab("log10(dry value)")+
     ggtitle(paste("PBDEs - LIO -",i))
   plot_list[[i]] = p
 }
@@ -190,13 +190,13 @@ dev.off()
 PB20_df <- PB_df %>% filter(PB_df$year == 2020)
 pdf("2020_PBDEs_Over_WRIAs.pdf")
 PB20_df %>% 
-  ggplot(aes(x = wria_nr, y = log(dry_value))) +
+  ggplot(aes(x = wria_nr, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
   theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("WRIA") +
-  ylab("log(dry value)")+
+  ylab("log10(dry value)")+
   ggtitle("2020 - PBDEs Across WRIAs")
 dev.off()
 
