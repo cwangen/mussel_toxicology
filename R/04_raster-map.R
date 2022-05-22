@@ -28,11 +28,11 @@ puget_sound <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group)) +
   ylab("Latitude") +
   xlab("Longitude") +
   coord_fixed(xlim = c(-123.5, -122), ylim = c(47, 49), ratio = 1.3) +
-  #  theme(plot.background = element_rect(fill = "white"),
-  #       panel.background = element_rect(fill="white", color = "black"),
-  #      panel.border = element_rect(colour = "black", fill=NA, size=1),
-  #     panel.grid.major = element_blank(),
-  #    panel.grid.minor = element_blank()) + 
+   theme(plot.background = element_rect(fill = "white"),
+         panel.background = element_rect(fill="white", color = "black"),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+       panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()) + 
   scale_x_continuous(breaks = c(-123, -122.5),
                      expand = c(0, 0),
                      labels=c(expression(paste(123*degree,"W")),
