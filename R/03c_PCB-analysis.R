@@ -121,10 +121,10 @@ PC_df %>%
   ggplot(aes(x = lio_areas, y = log(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1) +
-  theme(axis.text.x=element_text(angle=270,hjust=1)) +
+  ggdist::stat_dots(side = "left", dotsize = .3, justification = 1.1, binwidth = .1)+
+  theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
   xlab("LIO Area") +
-  ylab("log(dry value)") +
+  ylab("log(dry value)")+
 ggtitle("PCBs Across LIOs")
 dev.off()
 ##over wria_nr
