@@ -26,6 +26,8 @@ fontsize: 12pt
 header-includes:
   - \usepackage{lineno}
   - \linenumbers
+  - \usepackage{float}
+  - \floatplacement{figure}{H}
 bibliography: "references.bib"
 csl: "aslo.csl"
 urlcolor: blue
@@ -42,6 +44,10 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 
 ## set pandoc for formatting
 options("citation_format" = "pandoc")
+
+## setup for figures 
+library(here)
+outputs <- here("outputs")
 ```
 
 
@@ -56,44 +62,122 @@ All materials used to prepare this report can be found in the following GitHub r
 
 # Methods
 
-## Data
+## Data Analysis
 
-The data used in this analysis originated in the form of an Microsoft Excel file, titled "2013-20MusselCagesPOPsPAHs_Cnty_WRIA_LIO_Coverages.xlsx." The data included more fields than used in our analysis, and can be found in its entirety in "~mussel_toxics/data/raw/". The data was cleaned in order to correct minor inconsistencies, resulting in "~mussel_toxics/data/clean/totals_all.cvs".
+The data used in this analysis originated in the form of an Microsoft Excel file, titled "2013-20MusselCagesPOPsPAHs_Cnty_WRIA_LIO_Coverages.xlsx." The data included more fields than used in our analysis, and can be found in its entirety in "~mussel_toxics/data/raw/". The data was cleaned in order to correct minor inconsistencies and errors, resulting in "~mussel_toxics/data/clean/totals_all.cvs". 
 
--describe maps, raincloud plots?
+Dry weights of toxics found in each sample were used for analysis. Though samples did record the concentration of lipids, as well as wet weight, dry weight is the standard for reporting toxicology data. Summary tables were created for dry weights and categorical variables. Dry weight concentrations were also plotted on maps. Raincloud plots were for subcategories of WRIA and year. Raincloud plots consist of a box plot, an approximate probability density, and individual data points.
+
+Samples from the original aquaculture source used as reference were removed except for the creation of maps. Samples outside of Puget Sound (latitude less than -123.5) were also removed from sampling, but remain in map figures. Figures \ref{fig:PAmap}, \ref{fig:PBmap}, and \ref{fig:PCmap} display the concentrations of PAHs, PBDEs, and PCBs over time in mussel samples. They also shed light on how sampling is inconsistent both spatially and temporally. 
+
+```{r PAmap, echo = FALSE, message=FALSE, fig.align='center', fig.cap='This one has a legend cut short due to a high value, but perhaps I should just take logs?', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PAHmaps_short_legend.pdf"))
+```
+
+```{r PBmap, echo = FALSE, message=FALSE, fig.align='center', fig.cap='Logs are less of an issue here but it would be consistent.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PBDEmaps.pdf"))
+```
+
+```{r PCmap, echo = FALSE, message=FALSE, fig.align='center', fig.cap='Again, logs? Also better titles.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PCBmaps.pdf"))
+```
 
 ## Modeling
 
 We modeled the dry weight of the analytes found in mussels using a linear mixed model (LMM). These models consist of fixed effects, which remain constant, and random effects that follow a normal distribution and can correspondingly vary by individual. Our goals were to evaluate 1) The effect of year on dry weight of the relevant toxic analyte 2) If any other factors significantly affected dry weight, and 3) the effect of WRIA by year. 
 
-Exploratory analysis of the data allowed us to remove extraneous factors, while including those we wished to investigate. The model takes the form,
+Variables considered in analysis included latitude, longitude, year, county, LIO, WRIA, and mean percent AU. Other extraneous variables (IE, funding source) were not used as there is no possible relationship between these and analyte content, though this information could be helpful when we begin to focus on future sampling plans in future reports. Exploratory analysis of the data allowed us to remove extraneous factors, while including those we wished to investigate. Models were created for each of the independent analytes as their nature and distribution should not be assumed to be the same.
 
-$$D_{i} = \beta_{1,year}+ \beta_{2,year\times wria} 
- + \beta_{3}\text{surface}_{i}+ \beta_{4}\text{time}_{i} +\mu_{i}+\epsilon_{i}
-$$
+Initial model selection occurred by comparing Akaike information criterion (AIC) of all feasible possible models. Models that were unsuitable due to singular fits (overfitting) or violations or model assumptions such as non-normality were removed. The final model was chosen by taking into account AIC, noninfringement of model assumptions, and variables critical to project goals. 
 
-Where $D_{i}$ is the natural logarithm of the dry weight of the analyze from a sample site, $\beta_{1}$ is the categorical effect of year, $\beta_{2}$ is the interaction effect of year and WRIA, $\beta_{3}$ is the coefficient for mean percent AU of the nearest watershed region (**figure out how to actually describe this from Mariko**), $\beta_{4}$ is the coefficient for the time the mussels remained in the water (which varied by sampling year), $\mu$ is the random effect of longitude, and $\epsilon$ is the normally distributed error. 
-
-# Results
+# Results and Discussion
 
 ## Data Analysis
--maps?
--cloud plots?
 
-## Model
+```{r PAlios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PAHs_Over_LIOs.pdf"))
+```
+
+```{r PAyears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PAHs_Over_Years.pdf"))
+```
+
+```{r PBlios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PBDEs_Over_LIOs.pdf"))
+```
+
+```{r PByears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PBDEs_Over_Years.pdf"))
+```
+
+```{r PClios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PCBs_Over_LIOs.pdf"))
+```
+
+```{r PCyears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PCBs_Over_Years.pdf"))
+```
+
+## Modelling
+
+The final model takes the form,
+
+\begin{equation}
+D_{i} = \beta_{1,year}+ \beta_{2,year\times LIO} ...
++ \beta_{3}\text{surface}_{i}+ \beta_{4}\text{time}_{i} +\mu_{i}+\epsilon_{i}
+\end{equation}
+
+
+Where $D_{i}$ is the natural logarithm of the dry weight of the analyze from a sample site, $\beta_{1}$ is the categorical effect of year, $\beta_{2}$ is the interaction effect of year and WRIA, $\beta_{3}$ is the coefficient for mean percent AU of the nearest watershed region, $\beta_{4}$ is the coefficient for the time the mussels remained in the water (which varied by sampling year), $\mu$ is the random effect of longitude with $\mu_{i} \sim \text{N}(0, \sigma_\mu^2)$, and $\epsilon$ is the error distributed $\epsilon_{i} \sim \text{N}(0, \sigma_\epsilon^2)$. 
+
+```{r PAplots, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PAHplots.png"))
+```
+
+```{r PBplots, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PBDEplots.png"))
+```
+
+```{r PCplots, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+
+
+knitr::include_graphics(here(outputs,"PCBplots.png"))
+```
+
+While we decided to fit the same model for each analyte, the parameter estimates are different in each case (REF TABLE HERE). Most notably, in each case the variable with the highest t-value is mean percent AU, indicating that it is the strongest and most significant effect on dry weight. 
+
 -model parameters (this might require a table)
 -partial R2 for year
 -estimated effect of WIRA by year (significance?), also would need a table
 
 
-# Discussion
-
--note deficiencies in data
 -what we can and can't say
 
 # Toxics in the Nearshore Recommendation
 
-While the predictive capability of the current data is short due to the size of the sampling years, certain areas 
+ 
 
 # Acknowledgments
 
@@ -113,4 +197,8 @@ While the predictive capability of the current data is short due to the size of 
 # write.bibtex(file = "references.bib")
 ```
 
+<!-- # Appendix -->
 
+<!-- ## Maps -->
+
+<!-- ## Raincloud plots -->
