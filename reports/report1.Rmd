@@ -1,40 +1,46 @@
 ---
 title: "A Retrospective Analysis of Mussel Monitoring in the Puget Sound"
 author:
-  - Catherine Wangen:
-      email: cwangen@uw.edu
-      institute: qerm, safs
-      correspondence: true
-  - Mark D. Scheuerell:
-      email: scheuerl@uw.edu
-      institute: wacfwru
-      correspondence: true
+- Catherine Wangen:
+    email: cwangen@uw.edu
+    institute: qerm, safs
+    correspondence: yes
+- Mark D. Scheuerell:
+    email: scheuerl@uw.edu
+    institute: wacfwru
+    correspondence: yes
 institute:
-  - qerm: Quantitative Ecology and Resource Management, University of Washington, Seattle, WA
-  - safs: School of Aquatic and Fishery Sciences, University of Washington, Seattle, WA
-  - wacfwru: U.S. Geological Survey Washington Cooperative Fish and Wildlife Research Unit, School of Aquatic and Fishery Sciences, University of Washington, Seattle, WA
+- qerm: Quantitative Ecology and Resource Management, University of Washington, Seattle,
+    WA
+- safs: School of Aquatic and Fishery Sciences, University of Washington, Seattle,
+    WA
+- wacfwru: U.S. Geological Survey Washington Cooperative Fish and Wildlife Research
+    Unit, School of Aquatic and Fishery Sciences, University of Washington, Seattle,
+    WA
 output:
   pdf_document:
     highlight: haddock
     pandoc_args:
-      - '--lua-filter=scholarly-metadata.lua'
-      - '--lua-filter=author-info-blocks.lua'
+    - --lua-filter=scholarly-metadata.lua
+    - --lua-filter=author-info-blocks.lua
+  html_document:
+    df_print: paged
 documentclass: article
 geometry: margin=1in
 linestretch: 1.1
 fontsize: 12pt
 header-includes:
-  - \usepackage{lineno}
-  - \linenumbers
-  - \usepackage{float}
-  - \floatplacement{figure}{H}
-bibliography: "references.bib"
-csl: "aslo.csl"
+- \usepackage{lineno}
+- \linenumbers
+- \usepackage{float}
+- \floatplacement{figure}{H}
+bibliography: references.bib
+csl: aslo.csl
 urlcolor: blue
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warnings = FALSE)
 
 ## load {knitcitations}
 # library("knitcitations")
@@ -48,6 +54,73 @@ options("citation_format" = "pandoc")
 ## setup for figures 
 library(here)
 outputs <- here("outputs")
+```
+
+```{r analysis setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+
+#### Load libraries ####
+
+library(MASS)
+library(tidyverse)
+library(here)
+library(lme4)
+library(RLRsim)
+library(ggdist)
+library(tidyquant)
+library(dplyr)
+library(knitr)
+library(broom.mixed)
+library(sjPlot)
+library(AICcmodavg)
+
+# set directories
+clean_data_dir <- here("data", "clean")
+
+# get excel file name
+totals <- "totals_all.csv"
+
+# load dataframe
+mussel_df <- read_csv(here(clean_data_dir, totals), show_col_types = FALSE)
+
+#abs of dry value for now (note below)
+mussel_df$dry_value <- abs(mussel_df$dry_value)
+
+#as category
+mussel_df$year <- as.factor(mussel_df$year)
+mussel_df$wria_nr <- as.factor(mussel_df$wria_nr)
+mussel_df$lio_areas <- as.factor(mussel_df$lio_areas)
+
+#remove Penn Cove reference samples
+mussel_df <- mussel_df[!is.na(mussel_df$fund_source),]
+mussel_df <- subset(mussel_df, site_name!="Penn Cove Reference")
+
+#remove samples from outside Puget sound
+mussel_df <- subset(mussel_df, longitude > -123.5)
+
+#create analyte dataframes
+PA_df <- mussel_df %>%
+  filter(mussel_df$analyte == "SumPAHs16")
+PA_df <- PA_df[complete.cases(PA_df),]
+PB_df <- mussel_df %>%
+  filter(mussel_df$analyte == "SumPBDEs11")
+PB_df <- PB_df[complete.cases(PB_df),]
+PC_df <- mussel_df %>%
+  filter(mussel_df$analyte == "SumPCBs2x17")
+PC_df <- PC_df[complete.cases(PC_df),]
+
+
+#create analyte dataframes with low data LIOs removed
+short_PC_df <-PC_df %>% filter(str_detect(lio_areas, 
+                                          paste(c("Island","San Juan","Strait of Juan de Fuca"), 
+                                                collapse = "|"), negate = TRUE))
+short_PB_df <-PB_df %>% filter(str_detect(lio_areas, 
+                                          paste(c("Island","San Juan","Strait of Juan de Fuca"), 
+                                                collapse = "|"), negate = TRUE))
+short_PA_df <-PA_df %>% filter(str_detect(lio_areas, 
+                                          paste(c("Island","San Juan","Strait of Juan de Fuca"), 
+                                                collapse = "|"), negate = TRUE))
+
 ```
 
 
@@ -70,23 +143,21 @@ Dry weights of toxics found in each sample were used for analysis. Though sample
 
 Samples from the original aquaculture source used as reference were removed except for the creation of maps. Samples outside of Puget Sound (latitude less than -123.5) were also removed from sampling, but remain in map figures. Figures \ref{fig:PAmap}, \ref{fig:PBmap}, and \ref{fig:PCmap} display the concentrations of PAHs, PBDEs, and PCBs over time in mussel samples. They also shed light on how sampling is inconsistent both spatially and temporally. 
 
-```{r PAmap, echo = FALSE, message=FALSE, fig.align='center', fig.cap='This one has a legend cut short due to a high value, but perhaps I should just take logs?', out.width='0.75\\linewidth'}
 
 
-knitr::include_graphics(here(outputs,"PAHmaps_short_legend.pdf"))
+```{r PAmap}
+knitr::include_graphics(here("outputs","PAHmaps_short_legend.pdf"))
 ```
 
-```{r PBmap, echo = FALSE, message=FALSE, fig.align='center', fig.cap='Logs are less of an issue here but it would be consistent.', out.width='0.75\\linewidth'}
-
-
-knitr::include_graphics(here(outputs,"PBDEmaps.pdf"))
+```{r PBmap}
+knitr::include_graphics(here("outputs","PBDEmaps.pdf"))
 ```
 
-```{r PCmap, echo = FALSE, message=FALSE, fig.align='center', fig.cap='Again, logs? Also better titles.', out.width='0.75\\linewidth'}
-
-
+```{r PCMap}
 knitr::include_graphics(here(outputs,"PCBmaps.pdf"))
 ```
+
+ 
 
 ## Modeling
 
@@ -100,77 +171,466 @@ Initial model selection occurred by comparing Akaike information criterion (AIC)
 
 ## Data Analysis
 
-```{r PAlios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+Here's the code that makes these
+
+```{r not appendix raincloud plots}
+
+#### PAHs ####
+# raincloud plots
+##over years
+#pdf("PAHs_Over_Years.pdf")
+PA_df %>% 
+  ggplot(aes(x = year, y = log10(dry_value))) +
+  ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+  geom_boxplot(width = .1, outlier.shape = NA) +
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
+  theme(axis.text.x=element_text(angle=270,hjust=1)) +
+  xlab("Year") +
+  ylab("log10(dry value)")+
+  ggtitle("PAHs Across Years")
+#dev.off()
+## over LIOs
+#pdf("PAHs_Over_LIOs.pdf")
+PA_df %>% 
+  ggplot(aes(x = lio_areas, y = log10(dry_value))) +
+  ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+  geom_boxplot(width = .1, outlier.shape = NA) +
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+  theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
+  xlab("LIO Area") +
+  ylab("log10(dry value)")+
+  ggtitle("PAHs Across LIOs")
+#dev.off()
+
+#### PBDEs ####
+##over years
+#pdf("PBDEs_Over_Years.pdf")
+PB_df %>% 
+  ggplot(aes(x = year, y = log10(dry_value))) +
+  ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+  geom_boxplot(width = .1, outlier.shape = NA) +
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
+  theme(axis.text.x=element_text(angle=270,hjust=1)) +
+  xlab("Year") +
+  ylab("log10(dry value)")+
+  ggtitle("PBDEs Across Years")
+#dev.off()
+## over LIOs
+#pdf("PBDEs_Over_LIOs.pdf")
+PB_df %>% 
+  ggplot(aes(x = lio_areas, y = log10(dry_value))) +
+  ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+  geom_boxplot(width = .1, outlier.shape = NA) +
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
+   theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
+  xlab("LIO Area") +
+  ylab("log10(dry value)")+
+  ggtitle("PBDEs Across LIOs")
+#dev.off()
+
+#### PCBs ####
+##over years
+#pdf("PCBs_Over_Years.pdf")
+PC_df %>% 
+  ggplot(aes(x = year, y = log10(dry_value))) +
+  ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+  geom_boxplot(width = .1, outlier.shape = NA) +
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
+theme(axis.text.x=element_text(angle=270,hjust=1)) +
+  xlab("Year") +
+  ylab("log10(dry value)")+
+ggtitle("PCBs Across Years")
+#dev.off()
+## over LIO
+#pdf("PCBs_Over_LIOs.pdf")
+PC_df %>% 
+  ggplot(aes(x = lio_areas, y = log10(dry_value))) +
+  ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+  geom_boxplot(width = .1, outlier.shape = NA) +
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
+  theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
+  xlab("LIO Area") +
+  ylab("log10(dry value)")+
+ggtitle("PCBs Across LIOs")
+#dev.off()
 
 
-knitr::include_graphics(here(outputs,"PAHs_Over_LIOs.pdf"))
 ```
 
-```{r PAyears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+<!-- Or here's the PDFs -->
+
+<!-- ```{r PAlios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
 
 
-knitr::include_graphics(here(outputs,"PAHs_Over_Years.pdf"))
-```
+<!-- knitr::include_graphics(here(outputs,"PAHs_Over_LIOs.pdf")) -->
+<!-- ``` -->
 
-```{r PBlios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
-
-
-knitr::include_graphics(here(outputs,"PBDEs_Over_LIOs.pdf"))
-```
-
-```{r PByears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+<!-- ```{r PAyears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
 
 
-knitr::include_graphics(here(outputs,"PBDEs_Over_Years.pdf"))
-```
+<!-- knitr::include_graphics(here(outputs,"PAHs_Over_Years.pdf")) -->
+<!-- ``` -->
 
-```{r PClios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
-
-
-knitr::include_graphics(here(outputs,"PCBs_Over_LIOs.pdf"))
-```
-
-```{r PCyears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+<!-- ```{r PBlios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
 
 
-knitr::include_graphics(here(outputs,"PCBs_Over_Years.pdf"))
-```
+<!-- knitr::include_graphics(here(outputs,"PBDEs_Over_LIOs.pdf")) -->
+<!-- ``` -->
+
+<!-- ```{r PByears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
+
+
+<!-- knitr::include_graphics(here(outputs,"PBDEs_Over_Years.pdf")) -->
+<!-- ``` -->
+
+<!-- ```{r PClios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
+
+
+<!-- knitr::include_graphics(here(outputs,"PCBs_Over_LIOs.pdf")) -->
+<!-- ``` -->
+
+<!-- ```{r PCyears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
+
+
+<!-- knitr::include_graphics(here(outputs,"PCBs_Over_Years.pdf")) -->
+<!-- ``` -->
 
 ## Modelling
+
+```{r current final model}
+
+#### PAH ####
+PA_LMM <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|longitude),
+               data = short_PA_df,
+               na.action = "na.fail")
+
+#### PBDEs ####
+PB_LMM <- lmer(log(dry_value) ~
+              time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|longitude),
+               data = short_PB_df,
+               na.action = "na.fail")
+
+#### PCBs ####
+PC_LMM <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+
+                 (1|longitude),
+               data = short_PC_df,
+               na.action = "na.fail")
+
+
+```
+
 
 The final model takes the form,
 
 \begin{equation}
 D_{i} = \beta_{1,year}+ \beta_{2,year\times LIO}
-+ \beta_{3}\text{surface}_{i}+ \beta_{4}\text{time}_{i} +\mu_{i}+\epsilon_{i}
++ \beta_{3}\text{surface}_{i}+ \beta_{4}\text{time}_{i} +\mu_{i,j}+\epsilon_{i}
 \end{equation}
 
 
-Where $D_{i}$ is the natural logarithm of the dry weight of the analyze from a sample site, $\beta_{1}$ is the categorical effect of year, $\beta_{2}$ is the interaction effect of year and LIO, $\beta_{3}$ is the coefficient for mean percent AU of the nearest watershed region, $\beta_{4}$ is the coefficient for the time the mussels remained in the water (which varied by sampling year), $\mu$ is the random effect of longitude with $\mu_{i} \sim \text{N}(0, \sigma_\mu^2)$, and $\epsilon$ is the error distributed $\epsilon_{i} \sim \text{N}(0, \sigma_\epsilon^2)$. 
+Where $D_{i}$ is the natural logarithm of the dry weight of the analyze from a sample site, $\beta_{1}$ is the categorical effect of year, $\beta_{2}$ is the interaction effect of year and LIO, $\beta_{3}$ is the coefficient for mean percent AU of the nearest watershed region, $\beta_{4}$ is the coefficient for the time the mussels remained in the water (which varied by sampling year), $\mu$ is the random effect of longitude nested in LIO $\mu_{i} \sim \text{N}(0, \sigma_\mu^2)$, and $\epsilon$ is the error distributed $\epsilon_{i} \sim \text{N}(0, \sigma_\epsilon^2)$. 
 
-```{r PAplots, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+```{r PAmodel plots}
+
+#### QQ plots ####
+## set plot area
+par(mai = c(0.9, 0.9, 0.6, 0.1),
+    omi = c(0, 0, 0, 0),
+    mfrow = c(1,3), cex.lab = 1.2)
+
+## residuals vs fitted
+plot(fitted(PA_LMM), residuals(PA_LMM), las = 1, pch = 1,
+     xlab = "Fitted", ylab = "Residuals",
+     main = "Residuals vs Fitted")
+abline(h=0, lty = "dashed")
 
 
-knitr::include_graphics(here(outputs,"PAHplots.png"))
+## residuals
+qqnorm(residuals(PA_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
+qqline(residuals(PA_LMM))
+
+## Random effects
+qqnorm(unlist(ranef(PA_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
+qqline(unlist(ranef(PA_LMM)))
+
+
 ```
 
-```{r PBplots, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+```{r PBmodel plots}
+
+#### QQ plots ####
+## set plot area
+par(mai = c(0.9, 0.9, 0.6, 0.1),
+    omi = c(0, 0, 0, 0),
+    mfrow = c(1,3), cex.lab = 1.2)
+
+## residuals vs fitted
+plot(fitted(PB_LMM), residuals(PB_LMM), las = 1, pch = 1,
+     xlab = "Fitted", ylab = "Residuals",
+     main = "Residuals vs Fitted")
+abline(h=0, lty = "dashed")
 
 
-knitr::include_graphics(here(outputs,"PBDEplots.png"))
+## residuals
+qqnorm(residuals(PB_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
+qqline(residuals(PB_LMM))
+
+## Random effects
+qqnorm(unlist(ranef(PB_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
+qqline(unlist(ranef(PB_LMM)))
+
+
 ```
 
-```{r PCplots, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figued these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'}
+```{r PCmodel plots}
+
+#### QQ plots ####
+## set plot area
+par(mai = c(0.9, 0.9, 0.6, 0.1),
+    omi = c(0, 0, 0, 0),
+    mfrow = c(1,3), cex.lab = 1.2)
+
+## residuals vs fitted
+plot(fitted(PC_LMM), residuals(PC_LMM), las = 1, pch = 1,
+     xlab = "Fitted", ylab = "Residuals",
+     main = "Residuals vs Fitted")
+abline(h=0, lty = "dashed")
 
 
-knitr::include_graphics(here(outputs,"PCBplots.png"))
+## residuals
+qqnorm(residuals(PC_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
+qqline(residuals(PC_LMM))
+
+## Random effects
+qqnorm(unlist(ranef(PC_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
+qqline(unlist(ranef(PC_LMM)))
+
+
 ```
+
+
+```{r PA AIC table}
+
+PA_liolat <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/latitude) ,
+               data = short_PA_df,
+               na.action = "na.fail")
+
+PA_liolon <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/longitude),
+               data = short_PA_df,
+               na.action = "na.fail")
+
+PA_lio <- lmer(log(dry_value) ~
+                          time +
+                          year +
+                          mean_is_au +
+                          year:lio_areas +
+                          (1|lio_areas),
+                        data = short_PA_df,
+                        na.action = "na.fail")
+
+PA_lat <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|latitude),
+                     data = short_PA_df,
+                     na.action = "na.fail")
+
+PA_lon <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|longitude),
+                     data = short_PA_df,
+                     na.action = "na.fail")
+
+models <- list(PA_liolat,PA_liolon,PA_lio,PA_lat,PA_lon)
+model.names <- c("(1|LIO/latitude)","(1|LIO/longitude)","(1|LIO)","(1|latitude)","(1|longitude)")
+
+table <- (aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
+table$Modnames <- substring(table$Modnames,1)
+table <- table[c("Modnames","AIC","Delta_AIC")]
+colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
+
+PA_AIC_table <- table
+
+kable(PA_AIC_table)
+
+kable(anova(PA_LMM))
+
+```
+
+
+```{r PB AIC table}
+
+PB_liolat <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/latitude) ,
+               data = short_PB_df,
+               na.action = "na.fail")
+
+PB_liolon <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/longitude),
+               data = short_PB_df,
+               na.action = "na.fail")
+
+PB_lio <- lmer(log(dry_value) ~
+                          time +
+                          year +
+                          mean_is_au +
+                          year:lio_areas +
+                          (1|lio_areas),
+                        data = short_PB_df,
+                        na.action = "na.fail")
+
+PB_lat <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|latitude),
+                     data = short_PB_df,
+                     na.action = "na.fail")
+
+PB_lon <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|longitude),
+                     data = short_PB_df,
+                     na.action = "na.fail")
+
+PB_notime <- lmer(log(dry_value) ~
+                      # time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|longitude),
+                     data = short_PB_df,
+                     na.action = "na.fail")
+
+models <- list(PB_liolat,PB_liolon,PB_lio,PB_lat,PB_lon)
+model.names <- c("(1|LIO/latitude)","(1|LIO/longitude)","(1|LIO)","(1|latitude)","(1|longitude)")
+
+table <- (aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
+table$Modnames <- substring(table$Modnames,1)
+table <- table[c("Modnames","AIC","Delta_AIC")]
+colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
+
+PB_AIC_table <- table
+
+kable(PB_AIC_table)
+
+kable(anova(PB_LMM))
+
+kable(anova(PB_LMM,PB_notime))
+
+```
+
+```{r PC AIC table}
+
+# does not converge, is not best anyway
+PC_liolat <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/latitude) ,
+               data = short_PC_df,
+               na.action = "na.fail")
+
+PC_liolon <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/longitude),
+               data = short_PC_df,
+               na.action = "na.fail")
+
+PC_lio <- lmer(log(dry_value) ~
+                          time +
+                          year +
+                          mean_is_au +
+                          year:lio_areas +
+                          (1|lio_areas),
+                        data = short_PC_df,
+                        na.action = "na.fail")
+
+PC_lat <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|latitude),
+                     data = short_PC_df,
+                     na.action = "na.fail")
+
+PC_lon <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|longitude),
+                     data = short_PC_df,
+                     na.action = "na.fail")
+
+
+#NOTE THAT LIO/LAT DOES NOT CONVERGE. Which, along with the higher AIC, likely means that RE combo is not good.
+
+models <- list(PC_liolat,PC_liolon,PC_lio,PC_lat,PC_lon)
+model.names <- c("(1|LIO/latitude)","(1|LIO/longitude)","(1|LIO)","(1|latitude)","(1|longitude)")
+
+table <- (aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
+table$Modnames <- substring(table$Modnames,1)
+table <- table[c("Modnames","AIC","Delta_AIC")]
+colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
+
+PC_AIC_table <- table
+
+kable(PC_AIC_table)
+
+kable(anova(PC_LMM))
+
+```
+
 
 While we decided to fit the same model for each analyte, the parameter estimates are different in each case (REF TABLE HERE). Most notably, in each case the variable with the highest t-value is mean percent AU, indicating that it is the strongest and most significant effect on dry weight. 
 
 -model parameters (this might require a table)
--partial R2 for year
--estimated effect of WIRA by year (significance?), also would need a table
 
 
 -what we can and can't say
@@ -197,8 +657,100 @@ While we decided to fit the same model for each analyte, the parameter estimates
 # write.bibtex(file = "references.bib")
 ```
 
-<!-- # Appendix -->
+# Appendix
+```{r include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 
-<!-- ## Maps -->
 
-<!-- ## Raincloud plots -->
+#tab_model(PA_LMM, PB_LMM, PC_LMM)
+```
+
+
+## Parameter Summary Tables
+
+```{r}
+
+kable(tidy(PA_LMM))
+kable(tidy(PB_LMM))
+kable(tidy(PC_LMM))
+
+```
+
+
+
+## Raincloud plots
+
+These also exist as PDFs or could probably exist as individual files/plots etc. 
+
+```{r PAH appendix raincloud plots, message = FALSE, echo = FALSE}
+
+#PAH LIO plots
+plot_list = list()
+for (i in unique(PA_df$wria_nr)){
+  wria_subset <- PA_df[PA_df$wria_nr==i,]
+  p = wria_subset %>%
+    ggplot(aes(x = year, y = log10(dry_value))) +
+    ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+    geom_boxplot(width = .1, outlier.shape = NA) +
+    ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1) +
+   ggtitle(paste("PAHs - WRIA #",i)) +
+   # theme(axis.text.x=element_text(angle=270,hjust=1)) +
+    xlab("Year") +
+    ylab("log10(dry value)")
+  plot_list[[i]] = p
+                                }
+# I cannot get this to mute the list?
+print(plot_list)
+
+```
+
+```{r PBDE appendix raincloud plots, message = FALSE, echo = FALSE}
+
+
+# PBDE LIO plots
+plot_list = list()
+for (i in unique(PB_df$lio_areas)){
+  wria_subset <- PB_df[PB_df$lio_areas==i,]
+  p = wria_subset %>%
+    ggplot(aes(x = year, y = log10(dry_value))) +
+    ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+    geom_boxplot(width = .1, outlier.shape = NA) +
+    ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
+    theme(axis.text.x=element_text(angle=270,hjust=1)) +
+    xlab("LIO") +
+    ylab("log10(dry value)")+
+    ggtitle(paste("PBDEs - LIO -",i))
+  plot_list[[i]] = p
+}
+
+# I cannot get this to mute the list?
+print(plot_list)
+
+```
+
+```{r PCB appendix raincloud plots, message = FALSE, echo = FALSE}
+
+# PCB LIO plots
+plot_list = list()
+for (i in unique(PC_df$lio_areas)){
+  wria_subset <- PC_df[PC_df$lio_areas==i,]
+  p = wria_subset %>%
+    ggplot(aes(x = year, y = log10(dry_value))) +
+    ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+    geom_boxplot(width = .1, outlier.shape = NA) +
+    ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
+    theme(axis.text.x=element_text(angle=270,hjust=1)) +
+    xlab("LIO") +
+    ylab("log10(dry value)")+
+    ggtitle(paste("PCBs - LIO -",i))
+  plot_list[[i]] = p
+  
+}
+# I cannot get this to mute the list?
+print(plot_list)
+# for (i in unique(PC_df$wria_nr)){
+#   print(plot_list[[i]])
+# }
+
+```
+
