@@ -109,7 +109,7 @@ PC_df %>%
   ggplot(aes(x = year, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)
+  ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
 theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("Year") +
   ylab("log10(dry value)")+
@@ -133,7 +133,7 @@ PC_df %>%
   ggplot(aes(x = wria_nr, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
-  ggdist::stat_dots(side = "left", dotsize = .0.5, justification = 1.1, binwidth = .1) +
+  ggdist::stat_dots(side = "left", dotsize = 0.5, justification = 1.1, binwidth = .1) +
   theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("WRIA") +
   ylab("log10(dry value)")+
