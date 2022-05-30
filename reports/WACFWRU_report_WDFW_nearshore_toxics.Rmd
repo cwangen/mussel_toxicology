@@ -226,11 +226,25 @@ ggtitle("PCBs Across LIOs")
 ```
 
 
-## Modeling
+## Statistical modeling
 
-We modeled the dry weight of the analytes found in mussels using a linear mixed model (LMM). These models consist of fixed effects, which remain constant, and random effects that follow a normal distribution and can correspondingly vary by individual. Our goals were to evaluate 1) The effect of year on dry weight of the relevant toxic analyte 2) If any other factors significantly affected dry weight, and 3) the effect of WRIA by year. 
+We modeled the dry weight of the analytes found in mussels using a linear mixed model (LMM). These models consist of fixed effects, which remain constant, and random effects that follow a normal distribution and can correspondingly vary by individual, location, etc. We considered the following explanatory variables in our analysis: 
 
-Variables considered in analysis included time (of mussels spent in water), latitude, longitude, year, county, LIO, WRIA, and mean percent AU. Other extraneous variables (IE, funding source) were not used as there is no possible relationship between these and analyte content, though this information could be helpful when we begin to focus on future sampling plans in future reports. Exploratory analysis of the data allowed us to remove extraneous factors, while including those we wished to investigate. Models were created for each of the independent analytes as their nature and distribution should not be assumed to be the same.
+* time mussels spent in water;
+
+* latitude and longitude;
+
+* year (as a fixed factor);
+
+* county;
+
+* LIO;
+
+* WRIA;
+
+* mean percent AU.
+
+Other extraneous variables (IE, funding source) were not used as there is no possible relationship between these and analyte content, though this information could be helpful when we begin to focus on future sampling plans. Exploratory analysis of the data allowed us to remove extraneous factors, while including those we wished to investigate. Models were created for each of the analytes independently, as their nature and distribution should not be assumed to be the same.
 
 Initial model selection occurred by comparing the Akaike Information Criterion (AIC) of all feasible possible models. Models that were unsuitable due to singular fits (overfitting) or violations or model assumptions such as non-normality were removed. The final model was chosen by taking into account AIC, noninfringement of model assumptions, and variables critical to project goals. 
 
@@ -322,9 +336,13 @@ D_{a,i} = \alpha_{a,year} + \gamma_{a,year\times LIO}
 \end{equation}
 
 
-Where $D_{a,i}$ is the natural logarithm of the dry weight of analyte $a$ from a sample site $i$, $\alpha_{a,year}$ is the categorical effect of year on analyte $a$, $\gamma_{a,year\times LIO}$ is the interaction effect of year and LIO on analyte $a$, $\beta_{a}$ is the effect of mean percent AU of the nearest watershed region on analyte $a$ from location $i$, $\tau_{a}$ is the effect of the time the mussels remained in the water (which varied by sampling year) at location $i$ for analyte $a$, $\mu_{a,[LIO:lon]}$ is the random effect of longitude nested in LIO on analyte $a$, such that $\mu_{a,[LIO:lon]} \sim \text{N}(0, \sigma_\mu^2)$, and $\epsilon_{a,i}$ is the residual error, which is normally distributed with $\epsilon_{a,i} \sim \text{N}(0, \sigma_\epsilon^2)$. 
+where $D_{a,i}$ is the natural logarithm of the dry weight of analyte $a$ from a sample site $i$, $\alpha_{a,year}$ is the categorical effect of year on analyte $a$, $\gamma_{a,year\times LIO}$ is the interaction effect of year and LIO on analyte $a$, $\beta_{a}$ is the effect of mean percent AU of the nearest watershed region on analyte $a$ from location $i$, $\tau_{a}$ is the effect of the time the mussels remained in the water (which varied by sampling year) at location $i$ for analyte $a$, $\mu_{a,[LIO:lon]}$ is the random effect of longitude nested within LIO on analyte $a$, such that $\mu_{a,[LIO:lon]} \sim \text{N}(0, \sigma_\mu^2)$, and $\epsilon_{a,i}$ is the residual error, which is normally distributed with $\epsilon_{a,i} \sim \text{N}(0, \sigma_\epsilon^2)$. 
 
-```{r PAmodel plots}
+## Model diagnostics
+
+
+
+```{r PAdiags, fig.dim = c(7,3), fig.cap = "\\label{fig:PAdiags}Model diagnostics for the top ranked model for PAHs."}
 
 #### QQ plots ####
 ## set plot area
@@ -338,7 +356,6 @@ plot(fitted(PA_LMM), residuals(PA_LMM), las = 1, pch = 1,
      main = "Residuals vs Fitted")
 abline(h=0, lty = "dashed")
 
-
 ## residuals
 qqnorm(residuals(PA_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
 qqline(residuals(PA_LMM))
@@ -346,11 +363,9 @@ qqline(residuals(PA_LMM))
 ## Random effects
 qqnorm(unlist(ranef(PA_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
 qqline(unlist(ranef(PA_LMM)))
-
-
 ```
 
-```{r PBmodel plots}
+```{r PBdiags, fig.dim = c(7,3), fig.cap = "\\label{fig:PBdiags}Model diagnostics for the top ranked model for PBDEs."}
 
 #### QQ plots ####
 ## set plot area
@@ -364,7 +379,6 @@ plot(fitted(PB_LMM), residuals(PB_LMM), las = 1, pch = 1,
      main = "Residuals vs Fitted")
 abline(h=0, lty = "dashed")
 
-
 ## residuals
 qqnorm(residuals(PB_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
 qqline(residuals(PB_LMM))
@@ -372,11 +386,9 @@ qqline(residuals(PB_LMM))
 ## Random effects
 qqnorm(unlist(ranef(PB_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
 qqline(unlist(ranef(PB_LMM)))
-
-
 ```
 
-```{r PCmodel plots}
+```{r PCdiags, fig.dim = c(7,3), fig.cap = "\\label{fig:PCdiags}Model diagnostics for the top ranked model for PCBs."}
 
 #### QQ plots ####
 ## set plot area
@@ -390,7 +402,6 @@ plot(fitted(PC_LMM), residuals(PC_LMM), las = 1, pch = 1,
      main = "Residuals vs Fitted")
 abline(h=0, lty = "dashed")
 
-
 ## residuals
 qqnorm(residuals(PC_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
 qqline(residuals(PC_LMM))
@@ -398,8 +409,6 @@ qqline(residuals(PC_LMM))
 ## Random effects
 qqnorm(unlist(ranef(PC_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
 qqline(unlist(ranef(PC_LMM)))
-
-
 ```
 
 
@@ -668,7 +677,7 @@ kable(tidy(PC_LMM))
 
 These also exist as PDFs or could probably exist as individual files/plots etc. 
 
-```{r PAH appendix raincloud plots, message = FALSE, echo = FALSE}
+```{r PAH appendix raincloud plots, message = FALSE, echo = FALSE, eval = FALSE}
 
 #PAH LIO plots
 plot_list = list()
@@ -690,7 +699,7 @@ print(plot_list)
 
 ```
 
-```{r PBDE appendix raincloud plots, message = FALSE, echo = FALSE}
+```{r PBDE appendix raincloud plots, message = FALSE, echo = FALSE, eval = FALSE}
 
 
 # PBDE LIO plots
@@ -714,7 +723,7 @@ print(plot_list)
 
 ```
 
-```{r PCB appendix raincloud plots, message = FALSE, echo = FALSE}
+```{r PCB appendix raincloud plots, message = FALSE, echo = FALSE, eval = FALSE}
 
 # PCB LIO plots
 plot_list = list()
