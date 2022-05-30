@@ -317,12 +317,12 @@ PC_LMM <- lmer(log(dry_value) ~
 The final model takes the form,
 
 \begin{equation}
-D_{i} = \beta_{1,year}+ \beta_{2,year\times LIO}
-+ \beta_{3}\text{surface}_{i}+ \beta_{4}\text{time}_{i} +\mu_{i,j}+\epsilon_{i}
+D_{a,i} = \alpha_{a,year} + \gamma_{a,year\times LIO}
++ \beta_{a}\text{surface}_{a,i} + \tau_{a}\text{time}_{a,i} + \mu_{a,[LIO:lon]} + \epsilon_{a,i}
 \end{equation}
 
 
-Where $D_{i}$ is the natural logarithm of the dry weight of the analyze from a sample site, $\beta_{1}$ is the categorical effect of year, $\beta_{2}$ is the interaction effect of year and LIO, $\beta_{3}$ is the coefficient for mean percent AU of the nearest watershed region, $\beta_{4}$ is the coefficient for the time the mussels remained in the water (which varied by sampling year), $\mu$ is the random effect of longitude nested in LIO $\mu_{i} \sim \text{N}(0, \sigma_\mu^2)$, and $\epsilon$ is the error distributed $\epsilon_{i} \sim \text{N}(0, \sigma_\epsilon^2)$. 
+Where $D_{a,i}$ is the natural logarithm of the dry weight of analyte $a$ from a sample site $i$, $\alpha_{a,year}$ is the categorical effect of year on analyte $a$, $\gamma_{a,year\times LIO}$ is the interaction effect of year and LIO on analyte $a$, $\beta_{a}$ is the effect of mean percent AU of the nearest watershed region on analyte $a$ from location $i$, $\tau_{a}$ is the effect of the time the mussels remained in the water (which varied by sampling year) at location $i$ for analyte $a$, $\mu_{a,[LIO:lon]}$ is the random effect of longitude nested in LIO on analyte $a$, such that $\mu_{a,[LIO:lon]} \sim \text{N}(0, \sigma_\mu^2)$, and $\epsilon_{a,i}$ is the residual error, which is normally distributed with $\epsilon_{a,i} \sim \text{N}(0, \sigma_\epsilon^2)$. 
 
 ```{r PAmodel plots}
 
