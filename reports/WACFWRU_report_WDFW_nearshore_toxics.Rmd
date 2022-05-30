@@ -1,30 +1,24 @@
 ---
 title: "A Retrospective Analysis of Mussel Monitoring in the Puget Sound"
 author:
-- Catherine Wangen:
-    email: cwangen@uw.edu
-    institute: qerm, safs
-    correspondence: yes
-- Mark D. Scheuerell:
-    email: scheuerl@uw.edu
-    institute: wacfwru
-    correspondence: yes
+  - name: Catherine Wangen
+    email: 'cwangen@uw.edu'
+    institute: [qerm]
+    correspondence: true
+  - name: Mark D. Scheuerell
+    email: 'scheuerl@uw.edu'
+    institute: [wacfwru]
+    correspondence: true
 institute:
-- qerm: Quantitative Ecology and Resource Management, University of Washington, Seattle,
-    WA
-- safs: School of Aquatic and Fishery Sciences, University of Washington, Seattle,
-    WA
-- wacfwru: U.S. Geological Survey Washington Cooperative Fish and Wildlife Research
-    Unit, School of Aquatic and Fishery Sciences, University of Washington, Seattle,
-    WA
+  - qerm: Quantitative Ecology and Resource Management, University of Washington, Seattle, WA
+  - wacfwru: U.S. Geological Survey Washington Cooperative Fish and Wildlife Research Unit, School of Aquatic and Fishery Sciences, University of Washington, Seattle, WA
 output:
   pdf_document:
     highlight: haddock
+    fig_caption: yes
     pandoc_args:
-    - --lua-filter=scholarly-metadata.lua
-    - --lua-filter=author-info-blocks.lua
-  html_document:
-    df_print: paged
+      - '--lua-filter=scholarly-metadata.lua'
+      - '--lua-filter=author-info-blocks.lua'
 documentclass: article
 geometry: margin=1in
 linestretch: 1.1
@@ -145,18 +139,18 @@ We used the dry weights of toxics found in each sample for analysis. Although th
 
 * Raincloud plots, consisting of a box plot, an approximate probability density, and the individual data points, for each toxin for based upon WRIA and year.
 
-Samples from the original aquaculture source used as reference were removed except for the creation of maps. Samples outside of Puget Sound (longitude less than -123.5) were also removed from sampling, but remain in map figures. Figures \ref{fig:PAmap}, \ref{fig:PBmap}, and \ref{fig:PCmap} display the concentrations of PAHs, PBDEs, and PCBs over time in mussel samples. They also shed light on how sampling is inconsistent both spatially and temporally. 
+Samples from the original aquaculture source used as reference materials were removed from the analyses, but included in the concentration maps. Samples outside of Puget Sound (east of -123.5 longitude) were also removed from sampling, but remain in map figures. Figures \ref{fig:PAmap}, \ref{fig:PBmap}, and \ref{fig:PCmap} display the concentrations of PAHs, PBDEs, and PCBs over time in mussel samples, respectively. They also shed light on how sampling is inconsistent both spatially and temporally. 
 
 
-```{r PAmap}
+```{r PAmap, fig.cap = "\\label{fig:PAmap}Estimated concentration of PAHs in Puget Sound."}
 knitr::include_graphics(here("outputs","PAHmaps_short_legend.pdf"))
 ```
 
-```{r PBmap}
+```{r PBmap, fig.cap = "\\label{fig:PBmap}Estimated concentration of PBDEs in Puget Sound."}
 knitr::include_graphics(here("outputs","PBDEmaps.pdf"))
 ```
 
-```{r PCMap}
+```{r PCMap, fig.cap = "\\label{fig:PCmap}Estimated concentration of PCBs in Puget Sound."}
 knitr::include_graphics(here(outputs,"PCBmaps.pdf"))
 ```
 
@@ -331,8 +325,6 @@ PC_LMM <- lmer(log(dry_value) ~
                  (1|longitude),
                data = short_PC_df,
                na.action = "na.fail")
-
-
 ```
 
 
@@ -473,7 +465,11 @@ PA_lon <- lmer(log(dry_value) ~
                      na.action = "na.fail")
 
 models <- list(PA_liolat,PA_liolon,PA_lio,PA_lat,PA_lon)
-model.names <- c("(1|LIO/latitude)","(1|LIO/longitude)","(1|LIO)","(1|latitude)","(1|longitude)")
+model.names <- c("(1|LIO/latitude)",
+                 "(1|LIO/longitude)",
+                 "(1|LIO)",
+                 "(1|latitude)",
+                 "(1|longitude)")
 
 table <- (aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
 table$Modnames <- substring(table$Modnames,1)
@@ -546,7 +542,11 @@ PB_notime <- lmer(log(dry_value) ~
                      na.action = "na.fail")
 
 models <- list(PB_liolat,PB_liolon,PB_lio,PB_lat,PB_lon)
-model.names <- c("(1|LIO/latitude)","(1|LIO/longitude)","(1|LIO)","(1|latitude)","(1|longitude)")
+model.names <- c("(1|LIO/latitude)",
+                 "(1|LIO/longitude)",
+                 "(1|LIO)",
+                 "(1|latitude)",
+                 "(1|longitude)")
 
 table <- (aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
 table$Modnames <- substring(table$Modnames,1)
@@ -615,7 +615,11 @@ PC_lon <- lmer(log(dry_value) ~
 #NOTE THAT LIO/LAT DOES NOT CONVERGE. Which, along with the higher AIC, likely means that RE combo is not good.
 
 models <- list(PC_liolat,PC_liolon,PC_lio,PC_lat,PC_lon)
-model.names <- c("(1|LIO/latitude)","(1|LIO/longitude)","(1|LIO)","(1|latitude)","(1|longitude)")
+model.names <- c("(1|LIO/latitude)",
+                 "(1|LIO/longitude)",
+                 "(1|LIO)",
+                 "(1|latitude)",
+                 "(1|longitude)")
 
 table <- (aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
 table$Modnames <- substring(table$Modnames,1)
@@ -661,13 +665,6 @@ While we decided to fit the same model for each analyte, the parameter estimates
 ```
 
 # Appendix
-```{r include = FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE)
-
-
-#tab_model(PA_LMM, PB_LMM, PC_LMM)
-```
-
 
 ## Parameter Summary Tables
 
