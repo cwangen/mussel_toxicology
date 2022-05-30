@@ -33,7 +33,7 @@ csl: aslo.csl
 urlcolor: blue
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warnings = FALSE)
 
 ## load {knitcitations}
@@ -230,70 +230,21 @@ ggtitle("PCBs Across LIOs")
 
 We modeled the dry weight of the analytes found in mussels using a linear mixed model (LMM). These models consist of fixed effects, which remain constant, and random effects that follow a normal distribution and can correspondingly vary by individual, location, etc. We considered the following explanatory variables in our analysis: 
 
-* time mussels spent in water;
-
+* time in days that the mussels spent in the water;
 * latitude and longitude;
-
 * year (as a fixed factor);
-
 * county;
-
 * LIO;
-
 * WRIA;
-
 * mean percent AU.
 
 Other extraneous variables (IE, funding source) were not used as there is no possible relationship between these and analyte content, though this information could be helpful when we begin to focus on future sampling plans. Exploratory analysis of the data allowed us to remove extraneous factors, while including those we wished to investigate. Models were created for each of the analytes independently, as their nature and distribution should not be assumed to be the same.
 
 Initial model selection occurred by comparing the Akaike Information Criterion (AIC) of all feasible possible models. Models that were unsuitable due to singular fits (overfitting) or violations or model assumptions such as non-normality were removed. The final model was chosen by taking into account AIC, noninfringement of model assumptions, and variables critical to project goals. 
 
-# Results and Discussion
+# Results
 
-## Data Analysis
-
-
-<!-- Or here's the PDFs -->
-
-<!-- ```{r PAlios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
-
-
-<!-- knitr::include_graphics(here(outputs,"PAHs_Over_LIOs.pdf")) -->
-<!-- ``` -->
-
-<!-- ```{r PAyears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
-
-
-<!-- knitr::include_graphics(here(outputs,"PAHs_Over_Years.pdf")) -->
-<!-- ``` -->
-
-<!-- ```{r PBlios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
-
-
-<!-- knitr::include_graphics(here(outputs,"PBDEs_Over_LIOs.pdf")) -->
-<!-- ``` -->
-
-<!-- ```{r PByears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
-
-
-<!-- knitr::include_graphics(here(outputs,"PBDEs_Over_Years.pdf")) -->
-<!-- ``` -->
-
-<!-- ```{r PClios, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
-
-
-<!-- knitr::include_graphics(here(outputs,"PCBs_Over_LIOs.pdf")) -->
-<!-- ``` -->
-
-<!-- ```{r PCyears, echo = FALSE, message=FALSE, fig.align='center', fig.cap='I figured these plots are the best to show, and the rest can go in the appendix, or just be referenced in the repo.', out.width='0.75\\linewidth'} -->
-
-
-<!-- knitr::include_graphics(here(outputs,"PCBs_Over_Years.pdf")) -->
-<!-- ``` -->
-
-## Modelling
-
-```{r current final model}
+```{r current final model, warning=FALSE}
 
 #### PAH ####
 PA_LMM <- lmer(log(dry_value) ~
@@ -328,19 +279,258 @@ PC_LMM <- lmer(log(dry_value) ~
 ```
 
 
-The final model takes the form,
+```{r PA AIC table, warning=FALSE}
+
+PA_liolat <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/latitude) ,
+               data = short_PA_df,
+               na.action = "na.fail")
+
+PA_liolon <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/longitude),
+               data = short_PA_df,
+               na.action = "na.fail")
+
+PA_lio <- lmer(log(dry_value) ~
+                          time +
+                          year +
+                          mean_is_au +
+                          year:lio_areas +
+                          (1|lio_areas),
+                        data = short_PA_df,
+                        na.action = "na.fail")
+
+PA_lat <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|latitude),
+                     data = short_PA_df,
+                     na.action = "na.fail")
+
+PA_lon <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|longitude),
+                     data = short_PA_df,
+                     na.action = "na.fail")
+
+models <- list(PA_liolat,PA_liolon,PA_lio,PA_lat,PA_lon)
+model.names <- c("latitude in LIO",
+                 "longitude in LIO",
+                 "LIO",
+                 "latitude",
+                 "longitude")
+
+table <- suppressWarnings(aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
+table$Modnames <- substring(table$Modnames, 1)
+# table <- table[c("Modnames","AIC","Delta_AIC")]
+# colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
+table <- table[c("Modnames", "Delta_AIC")]
+
+PA_AIC_table <- table
+
+```
+
+
+```{r PB AIC table, warning=FALSE}
+
+PB_liolat <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/latitude) ,
+               data = short_PB_df,
+               na.action = "na.fail")
+
+PB_liolon <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/longitude),
+               data = short_PB_df,
+               na.action = "na.fail")
+
+PB_lio <- lmer(log(dry_value) ~
+                          time +
+                          year +
+                          mean_is_au +
+                          year:lio_areas +
+                          (1|lio_areas),
+                        data = short_PB_df,
+                        na.action = "na.fail")
+
+PB_lat <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|latitude),
+                     data = short_PB_df,
+                     na.action = "na.fail")
+
+PB_lon <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|longitude),
+                     data = short_PB_df,
+                     na.action = "na.fail")
+
+PB_notime <- lmer(log(dry_value) ~
+                      # time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|longitude),
+                     data = short_PB_df,
+                     na.action = "na.fail")
+
+models <- list(PB_liolat,PB_liolon,PB_lio,PB_lat,PB_lon)
+model.names <- c("latitude in LIO",
+                 "longitude in LIO",
+                 "LIO",
+                 "latitude",
+                 "longitude")
+
+table <- suppressWarnings(aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
+table$Modnames <- substring(table$Modnames,1)
+# table <- table[c("Modnames","AIC","Delta_AIC")]
+# colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
+table <- table[c("Modnames", "Delta_AIC")]
+colnames(table) <- c("Random Effect of Model", "Delta AIC")
+
+PB_AIC_table <- table
+
+```
+
+```{r PC AIC table, warning=FALSE}
+
+# does not converge, is not best anyway
+PC_liolat <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/latitude) ,
+               data = short_PC_df,
+               na.action = "na.fail")
+
+PC_liolon <- lmer(log(dry_value) ~
+                 time +
+                 year +
+                 mean_is_au +
+                 year:lio_areas +
+                 (1|lio_areas/longitude),
+               data = short_PC_df,
+               na.action = "na.fail")
+
+PC_lio <- lmer(log(dry_value) ~
+                          time +
+                          year +
+                          mean_is_au +
+                          year:lio_areas +
+                          (1|lio_areas),
+                        data = short_PC_df,
+                        na.action = "na.fail")
+
+PC_lat <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|latitude),
+                     data = short_PC_df,
+                     na.action = "na.fail")
+
+PC_lon <- lmer(log(dry_value) ~
+                       time +
+                       year +
+                       mean_is_au +
+                       year:lio_areas +
+                       (1|longitude),
+                     data = short_PC_df,
+                     na.action = "na.fail")
+
+
+#NOTE THAT LIO/LAT DOES NOT CONVERGE. Which, along with the higher AIC, likely means that RE combo is not good.
+
+models <- list(PC_liolat,PC_liolon,PC_lio,PC_lat,PC_lon)
+model.names <- c("latitude in LIO",
+                 "longitude in LIO",
+                 "LIO",
+                 "latitude",
+                 "longitude")
+
+table <- suppressWarnings(aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
+table$Modnames <- substring(table$Modnames,1)
+# table <- table[c("Modnames","AIC","Delta_AIC")]
+# colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
+table <- table[c("Modnames", "Delta_AIC")]
+colnames(table) <- c("Random Effect of Model", "Delta AIC")
+
+PC_AIC_table <- table
+
+```
+
+## Model selection
+
+Based upon $Delta$AIC (Tables 1-3), the model with the most support from the data for all analytes is
 
 \begin{equation}
 D_{a,i} = \alpha_{a,year} + \gamma_{a,year\times LIO}
 + \beta_{a}\text{surface}_{a,i} + \tau_{a}\text{time}_{a,i} + \mu_{a,[LIO:lon]} + \epsilon_{a,i}
 \end{equation}
 
-
 where $D_{a,i}$ is the natural logarithm of the dry weight of analyte $a$ from a sample site $i$, $\alpha_{a,year}$ is the categorical effect of year on analyte $a$, $\gamma_{a,year\times LIO}$ is the interaction effect of year and LIO on analyte $a$, $\beta_{a}$ is the effect of mean percent AU of the nearest watershed region on analyte $a$ from location $i$, $\tau_{a}$ is the effect of the time the mussels remained in the water (which varied by sampling year) at location $i$ for analyte $a$, $\mu_{a,[LIO:lon]}$ is the random effect of longitude nested within LIO on analyte $a$, such that $\mu_{a,[LIO:lon]} \sim \text{N}(0, \sigma_\mu^2)$, and $\epsilon_{a,i}$ is the residual error, which is normally distributed with $\epsilon_{a,i} \sim \text{N}(0, \sigma_\epsilon^2)$. 
+
+
+```{r model_selection}
+kable(PA_AIC_table, digits = 1, caption = "Model selection results for PAHs.",
+  col.names = c("Random effect", "$\\Delta$AIC"),
+  escape = FALSE)
+
+kable(PB_AIC_table, digits = 1, caption = "Model selection results for PBDEs.",
+  col.names = c("Random effect", "$\\Delta$AIC"),
+  escape = FALSE)
+
+kable(PC_AIC_table, digits = 1, caption = "Model selection results for PCBs.",
+  col.names = c("Random effect", "$\\Delta$AIC"),
+  escape = FALSE)
+
+```
+
+## Parameter estimates
+
+```{r anova_tbl}
+kable(anova(PA_LMM), caption = "ANOVA table for the model of PAHs.")
+
+kable(anova(PB_LMM), caption = "ANOVA table for the model of PBDEs.")
+
+kable(anova(PB_LMM,PB_notime))
+
+kable(anova(PC_LMM), caption = "ANOVA table for the model of PCBs.")
+
+```
+
 
 ## Model diagnostics
 
-
+In general, models met the assumptions of well-behaved, independent, and identical errors (Figures \ref{fig:PAdiags} - \ref{fig:PCdiags}), but there was some indication of remaining information in the residuals for the model of PAHs (Figure \ref{fig:PAdiags}). Although there was some indication of heavy-tailed (leptokurtic) residuals, the Q-Q plots looked quite reasonable overall.
 
 ```{r PAdiags, fig.dim = c(7,3), fig.cap = "\\label{fig:PAdiags}Model diagnostics for the top ranked model for PAHs."}
 
@@ -411,223 +601,6 @@ qqnorm(unlist(ranef(PC_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
 qqline(unlist(ranef(PC_LMM)))
 ```
 
-
-```{r PA AIC table}
-
-PA_liolat <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/latitude) ,
-               data = short_PA_df,
-               na.action = "na.fail")
-
-PA_liolon <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/longitude),
-               data = short_PA_df,
-               na.action = "na.fail")
-
-PA_lio <- lmer(log(dry_value) ~
-                          time +
-                          year +
-                          mean_is_au +
-                          year:lio_areas +
-                          (1|lio_areas),
-                        data = short_PA_df,
-                        na.action = "na.fail")
-
-PA_lat <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|latitude),
-                     data = short_PA_df,
-                     na.action = "na.fail")
-
-PA_lon <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|longitude),
-                     data = short_PA_df,
-                     na.action = "na.fail")
-
-models <- list(PA_liolat,PA_liolon,PA_lio,PA_lat,PA_lon)
-model.names <- c("(1|LIO/latitude)",
-                 "(1|LIO/longitude)",
-                 "(1|LIO)",
-                 "(1|latitude)",
-                 "(1|longitude)")
-
-table <- (aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
-table$Modnames <- substring(table$Modnames,1)
-table <- table[c("Modnames","AIC","Delta_AIC")]
-colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
-
-PA_AIC_table <- table
-
-kable(PA_AIC_table)
-
-kable(anova(PA_LMM))
-
-```
-
-
-```{r PB AIC table}
-
-PB_liolat <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/latitude) ,
-               data = short_PB_df,
-               na.action = "na.fail")
-
-PB_liolon <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/longitude),
-               data = short_PB_df,
-               na.action = "na.fail")
-
-PB_lio <- lmer(log(dry_value) ~
-                          time +
-                          year +
-                          mean_is_au +
-                          year:lio_areas +
-                          (1|lio_areas),
-                        data = short_PB_df,
-                        na.action = "na.fail")
-
-PB_lat <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|latitude),
-                     data = short_PB_df,
-                     na.action = "na.fail")
-
-PB_lon <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|longitude),
-                     data = short_PB_df,
-                     na.action = "na.fail")
-
-PB_notime <- lmer(log(dry_value) ~
-                      # time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|longitude),
-                     data = short_PB_df,
-                     na.action = "na.fail")
-
-models <- list(PB_liolat,PB_liolon,PB_lio,PB_lat,PB_lon)
-model.names <- c("(1|LIO/latitude)",
-                 "(1|LIO/longitude)",
-                 "(1|LIO)",
-                 "(1|latitude)",
-                 "(1|longitude)")
-
-table <- (aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
-table$Modnames <- substring(table$Modnames,1)
-table <- table[c("Modnames","AIC","Delta_AIC")]
-colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
-
-PB_AIC_table <- table
-
-kable(PB_AIC_table)
-
-kable(anova(PB_LMM))
-
-kable(anova(PB_LMM,PB_notime))
-
-```
-
-```{r PC AIC table}
-
-# does not converge, is not best anyway
-PC_liolat <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/latitude) ,
-               data = short_PC_df,
-               na.action = "na.fail")
-
-PC_liolon <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/longitude),
-               data = short_PC_df,
-               na.action = "na.fail")
-
-PC_lio <- lmer(log(dry_value) ~
-                          time +
-                          year +
-                          mean_is_au +
-                          year:lio_areas +
-                          (1|lio_areas),
-                        data = short_PC_df,
-                        na.action = "na.fail")
-
-PC_lat <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|latitude),
-                     data = short_PC_df,
-                     na.action = "na.fail")
-
-PC_lon <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|longitude),
-                     data = short_PC_df,
-                     na.action = "na.fail")
-
-
-#NOTE THAT LIO/LAT DOES NOT CONVERGE. Which, along with the higher AIC, likely means that RE combo is not good.
-
-models <- list(PC_liolat,PC_liolon,PC_lio,PC_lat,PC_lon)
-model.names <- c("(1|LIO/latitude)",
-                 "(1|LIO/longitude)",
-                 "(1|LIO)",
-                 "(1|latitude)",
-                 "(1|longitude)")
-
-table <- (aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
-table$Modnames <- substring(table$Modnames,1)
-table <- table[c("Modnames","AIC","Delta_AIC")]
-colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
-
-PC_AIC_table <- table
-
-kable(PC_AIC_table)
-
-kable(anova(PC_LMM))
-
-```
 
 
 While we decided to fit the same model for each analyte, the parameter estimates are different in each case (REF TABLE HERE). Most notably, in each case the variable with the highest t-value is mean percent AU, indicating that it is the strongest and most significant effect on dry weight. 
