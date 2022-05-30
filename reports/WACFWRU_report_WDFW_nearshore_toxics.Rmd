@@ -142,40 +142,19 @@ We used the dry weights of toxics found in each sample for analysis. Although th
 Samples from the original aquaculture source used as reference materials were removed from the analyses, but included in the concentration maps. Samples outside of Puget Sound (east of -123.5 longitude) were also removed from sampling, but remain in map figures. Figures \ref{fig:PAmap}, \ref{fig:PBmap}, and \ref{fig:PCmap} display the concentrations of PAHs, PBDEs, and PCBs over time in mussel samples, respectively. They also shed light on how sampling is inconsistent both spatially and temporally. 
 
 
-```{r PAmap, fig.cap = "\\label{fig:PAmap}Estimated concentration of PAHs in Puget Sound."}
+```{r PAmap, fig.cap = "\\label{fig:PAmap}Estimated concentration of PAHs across Puget Sound."}
 knitr::include_graphics(here("outputs","PAHmaps_short_legend.pdf"))
 ```
 
-```{r PBmap, fig.cap = "\\label{fig:PBmap}Estimated concentration of PBDEs in Puget Sound."}
+```{r PBmap, fig.cap = "\\label{fig:PBmap}Estimated concentration of PBDEs across Puget Sound."}
 knitr::include_graphics(here("outputs","PBDEmaps.pdf"))
 ```
 
-```{r PCMap, fig.cap = "\\label{fig:PCmap}Estimated concentration of PCBs in Puget Sound."}
+```{r PCMap, fig.cap = "\\label{fig:PCmap}Estimated concentration of PCBs across Puget Sound."}
 knitr::include_graphics(here(outputs,"PCBmaps.pdf"))
 ```
 
- 
-
-## Modeling
-
-We modeled the dry weight of the analytes found in mussels using a linear mixed model (LMM). These models consist of fixed effects, which remain constant, and random effects that follow a normal distribution and can correspondingly vary by individual. Our goals were to evaluate 1) The effect of year on dry weight of the relevant toxic analyte 2) If any other factors significantly affected dry weight, and 3) the effect of WRIA by year. 
-
-Variables considered in analysis included time (of mussels spent in water), latitude, longitude, year, county, LIO, WRIA, and mean percent AU. Other extraneous variables (IE, funding source) were not used as there is no possible relationship between these and analyte content, though this information could be helpful when we begin to focus on future sampling plans in future reports. Exploratory analysis of the data allowed us to remove extraneous factors, while including those we wished to investigate. Models were created for each of the independent analytes as their nature and distribution should not be assumed to be the same.
-
-Initial model selection occurred by comparing Akaike information criterion (AIC) of all feasible possible models. Models that were unsuitable due to singular fits (overfitting) or violations or model assumptions such as non-normality were removed. The final model was chosen by taking into account AIC, noninfringement of model assumptions, and variables critical to project goals. 
-
-# Results and Discussion
-
-## Data Analysis
-
-Here's the code that makes these
-
-```{r not appendix raincloud plots}
-
-#### PAHs ####
-# raincloud plots
-##over years
-#pdf("PAHs_Over_Years.pdf")
+```{r rain_PAH_year, , fig.cap = "\\label{fig:rain_PAH_year}Distribution of the log concentration of PAHs across years."}
 PA_df %>% 
   ggplot(aes(x = year, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
@@ -185,9 +164,9 @@ PA_df %>%
   xlab("Year") +
   ylab("log10(dry value)")+
   ggtitle("PAHs Across Years")
-#dev.off()
-## over LIOs
-#pdf("PAHs_Over_LIOs.pdf")
+```
+
+```{r rain_PAH_LIO, , fig.cap = "\\label{fig:rain_PAH_LIO}Distribution of the log concentration of PAHs across LIOs."}
 PA_df %>% 
   ggplot(aes(x = lio_areas, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
@@ -196,11 +175,9 @@ PA_df %>%
   xlab("LIO Area") +
   ylab("log10(dry value)")+
   ggtitle("PAHs Across LIOs")
-#dev.off()
+```
 
-#### PBDEs ####
-##over years
-#pdf("PBDEs_Over_Years.pdf")
+```{r rain_PBDE_year, , fig.cap = "\\label{fig:rain_PBDE_year}Distribution of the log concentration of PBDEs across years."}
 PB_df %>% 
   ggplot(aes(x = year, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
@@ -210,9 +187,9 @@ PB_df %>%
   xlab("Year") +
   ylab("log10(dry value)")+
   ggtitle("PBDEs Across Years")
-#dev.off()
-## over LIOs
-#pdf("PBDEs_Over_LIOs.pdf")
+```
+
+```{r rain_PBDE_LIO, , fig.cap = "\\label{fig:rain_PBDE_LIO}Distribution of the log concentration of PBDEs across LIOs."}
 PB_df %>% 
   ggplot(aes(x = lio_areas, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
@@ -222,11 +199,9 @@ PB_df %>%
   xlab("LIO Area") +
   ylab("log10(dry value)")+
   ggtitle("PBDEs Across LIOs")
-#dev.off()
+```
 
-#### PCBs ####
-##over years
-#pdf("PCBs_Over_Years.pdf")
+```{r rain_PCB_year, , fig.cap = "\\label{fig:rain_PCB_year}Distribution of the log concentration of PCBs across years."}
 PC_df %>% 
   ggplot(aes(x = year, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
@@ -236,9 +211,9 @@ theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("Year") +
   ylab("log10(dry value)")+
 ggtitle("PCBs Across Years")
-#dev.off()
-## over LIO
-#pdf("PCBs_Over_LIOs.pdf")
+```
+
+```{r rain_PCB_LIO, , fig.cap = "\\label{fig:rain_PCB_LIO}Distribution of the log concentration of PCBs across LIOs."}
 PC_df %>% 
   ggplot(aes(x = lio_areas, y = log10(dry_value))) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
@@ -248,10 +223,21 @@ PC_df %>%
   xlab("LIO Area") +
   ylab("log10(dry value)")+
 ggtitle("PCBs Across LIOs")
-#dev.off()
-
-
 ```
+
+
+## Modeling
+
+We modeled the dry weight of the analytes found in mussels using a linear mixed model (LMM). These models consist of fixed effects, which remain constant, and random effects that follow a normal distribution and can correspondingly vary by individual. Our goals were to evaluate 1) The effect of year on dry weight of the relevant toxic analyte 2) If any other factors significantly affected dry weight, and 3) the effect of WRIA by year. 
+
+Variables considered in analysis included time (of mussels spent in water), latitude, longitude, year, county, LIO, WRIA, and mean percent AU. Other extraneous variables (IE, funding source) were not used as there is no possible relationship between these and analyte content, though this information could be helpful when we begin to focus on future sampling plans in future reports. Exploratory analysis of the data allowed us to remove extraneous factors, while including those we wished to investigate. Models were created for each of the independent analytes as their nature and distribution should not be assumed to be the same.
+
+Initial model selection occurred by comparing the Akaike Information Criterion (AIC) of all feasible possible models. Models that were unsuitable due to singular fits (overfitting) or violations or model assumptions such as non-normality were removed. The final model was chosen by taking into account AIC, noninfringement of model assumptions, and variables critical to project goals. 
+
+# Results and Discussion
+
+## Data Analysis
+
 
 <!-- Or here's the PDFs -->
 
