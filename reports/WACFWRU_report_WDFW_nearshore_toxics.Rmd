@@ -739,9 +739,11 @@ kable(tidy(PC_LMM), digits = 2,
 
 ## Raincloud plots
 
-Here are additional plots of the distribution of analytes across space and time.
+Here are additional plots of the distribution of analytes across WRIA and time.
 
-```{r PAH appendix raincloud plots, message = FALSE, echo = FALSE, eval = FALSE}
+### PAH
+
+```{r PAH appendix raincloud plots, message = FALSE, echo = FALSE}
 
 #PAH LIO plots
 plot_list = list()
@@ -752,33 +754,36 @@ for (i in unique(PA_df$wria_nr)){
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
     ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1) +
-   ggtitle(paste("PAHs - WRIA #",i)) +
-   # theme(axis.text.x=element_text(angle=270,hjust=1)) +
+    ggtitle(paste("PAHs - WRIA #",i)) +
+    # theme(axis.text.x=element_text(angle=270,hjust=1)) +
     xlab("Year") +
     ylab("log10(dry value)")
   plot_list[[i]] = p
-                                }
+}
 # I cannot get this to mute the list?
 print(plot_list)
 
 ```
 
-```{r PBDE appendix raincloud plots, message = FALSE, echo = FALSE, eval = FALSE}
+\newpage
 
+### PBDE
 
-# PBDE LIO plots
+```{r PBDE appendix raincloud plots, message = FALSE, echo = FALSE}
+
+# PBDE WRIA plots
 plot_list = list()
-for (i in unique(PB_df$lio_areas)){
-  wria_subset <- PB_df[PB_df$lio_areas==i,]
+for (i in unique(PB_df$wria_nr)){
+  wria_subset <- PB_df[PB_df$wria_nr==i,]
   p = wria_subset %>%
     ggplot(aes(x = year, y = log10(dry_value))) +
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
-    ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
-    theme(axis.text.x=element_text(angle=270,hjust=1)) +
-    xlab("LIO") +
-    ylab("log10(dry value)")+
-    ggtitle(paste("PBDEs - LIO -",i))
+    ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1) +
+    ggtitle(paste("PBDEs - WRIA #",i)) +
+    # theme(axis.text.x=element_text(angle=270,hjust=1)) +
+    xlab("Year") +
+    ylab("log10(dry value)")
   plot_list[[i]] = p
 }
 
@@ -787,29 +792,29 @@ print(plot_list)
 
 ```
 
-```{r PCB appendix raincloud plots, message = FALSE, echo = FALSE, eval = FALSE}
+\newpage
 
-# PCB LIO plots
+### PCB
+
+```{r PCB appendix raincloud plots, message = FALSE, echo = FALSE}
+
+# PCB WRIA plots
 plot_list = list()
-for (i in unique(PC_df$lio_areas)){
-  wria_subset <- PC_df[PC_df$lio_areas==i,]
+for (i in unique(PC_df$wria_nr)){
+  wria_subset <- PC_df[PC_df$wria_nr==i,]
   p = wria_subset %>%
     ggplot(aes(x = year, y = log10(dry_value))) +
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
-    ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
-    theme(axis.text.x=element_text(angle=270,hjust=1)) +
-    xlab("LIO") +
-    ylab("log10(dry value)")+
-    ggtitle(paste("PCBs - LIO -",i))
+    ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1) +
+    ggtitle(paste("PCBs - WRIA #",i)) +
+    # theme(axis.text.x=element_text(angle=270,hjust=1)) +
+    xlab("Year") +
+    ylab("log10(dry value)")
   plot_list[[i]] = p
-  
 }
 # I cannot get this to mute the list?
 print(plot_list)
-# for (i in unique(PC_df$wria_nr)){
-#   print(plot_list[[i]])
-# }
 
 ```
 
