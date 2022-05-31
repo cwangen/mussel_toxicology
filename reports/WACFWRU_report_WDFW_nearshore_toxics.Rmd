@@ -1,5 +1,6 @@
 ---
 title: "A Retrospective Analysis of Mussel Monitoring in the Puget Sound"
+date: "30 May 2022"
 author:
   - name: Catherine Wangen
     email: 'cwangen@uw.edu'
@@ -489,7 +490,16 @@ PC_AIC_table <- table
 
 ## Model selection
 
-Based upon $Delta$AIC (Tables 1-3), the model with the most support from the data for all analytes is
+Based upon $\Delta$AIC values (Tables 1-3), the model with the most support from the data for all analytes included fixed effects for
+
+* $year$;
+* a $year$ $\times$ $LIO$ interaction;
+* mean percent $AU$; and
+* number of $days$ the mussels were immersed.
+
+The model also included the random effect of longitude, but not latitude. There was very little evidence to support the inclusion of LIO as a random effect either.
+
+Specifically, the form of the best supported model is
 
 \begin{equation}
 D_{a,i} = \alpha_{a,year} + \gamma_{a,year\times LIO}
@@ -514,16 +524,43 @@ kable(PC_AIC_table, digits = 1, caption = "Model selection results for PCBs.",
 
 ```
 
-## Parameter estimates
+## ANOVA table
 
 ```{r anova_tbl}
-kable(anova(PA_LMM), caption = "ANOVA table for the model of PAHs.")
+kable(anova(PA_LMM),
+      caption = "ANOVA table for the model of PAHs.",
+      digits = c(0, 1, 1, 2),
+      col.names = c("df", "Sum Sq", "Mean Sq", "F-value"),
+      escape = FALSE)
 
-kable(anova(PB_LMM), caption = "ANOVA table for the model of PBDEs.")
+kable(anova(PB_LMM), caption = "ANOVA table for the model of PBDEs.",
+      digits = c(0, 1, 1, 2),
+      col.names = c("df", "Sum Sq", "Mean Sq", "F-value"),
+      escape = FALSE)
 
-kable(anova(PB_LMM,PB_notime))
+# kable(anova(PB_LMM,PB_notime))
 
-kable(anova(PC_LMM), caption = "ANOVA table for the model of PCBs.")
+kable(anova(PC_LMM), caption = "ANOVA table for the model of PCBs.",
+      digits = c(0, 1, 1, 2),
+      col.names = c("df", "Sum Sq", "Mean Sq", "F-value"),
+      escape = FALSE)
+
+```
+
+
+## Parameter estimates
+
+Parameter estimates and their associate 95% confidence intervals from the best supported models are provided in the following tables.
+
+```{r param_est_tbl}
+gtsummary::as_kable(gtsummary::tbl_regression(PA_LMM, tidy_fun = broom.mixed::tidy),
+                    caption = "Parameter estimates and 95% confidence intervals for the model of PAHs.")
+
+gtsummary::as_kable(gtsummary::tbl_regression(PB_LMM, tidy_fun = broom.mixed::tidy),
+                    caption = "Parameter estimates and 95% confidence intervals for the model of PBDEs.")
+
+gtsummary::as_kable(gtsummary::tbl_regression(PC_LMM, tidy_fun = broom.mixed::tidy),
+                    caption = "Parameter estimates and 95% confidence intervals for the model of PCBs.")
 
 ```
 
