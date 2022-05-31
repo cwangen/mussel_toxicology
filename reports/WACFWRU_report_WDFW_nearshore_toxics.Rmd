@@ -144,15 +144,18 @@ Samples from the original aquaculture source used as reference materials were re
 
 
 ```{r PAmap, fig.cap = "\\label{fig:PAmap}Estimated concentration of PAHs across Puget Sound."}
-knitr::include_graphics(here("outputs","PAHmaps_short_legend.pdf"))
+# knitr::include_graphics(here("outputs","PAHmaps_short_legend.pdf"))
+knitr::include_graphics(here("outputs","PAH_map.png"))
 ```
 
 ```{r PBmap, fig.cap = "\\label{fig:PBmap}Estimated concentration of PBDEs across Puget Sound."}
-knitr::include_graphics(here("outputs","PBDEmaps.pdf"))
+# knitr::include_graphics(here("outputs","PBDEmaps.pdf"))
+knitr::include_graphics(here("outputs","PBDE_map.png"))
 ```
 
 ```{r PCMap, fig.cap = "\\label{fig:PCmap}Estimated concentration of PCBs across Puget Sound."}
-knitr::include_graphics(here(outputs,"PCBmaps.pdf"))
+# knitr::include_graphics(here(outputs,"PCBmaps.pdf"))
+knitr::include_graphics(here(outputs,"PCB_map.png"))
 ```
 
 ```{r rain_PAH_year, , fig.cap = "\\label{fig:rain_PAH_year}Distribution of the log concentration of PAHs across years."}
