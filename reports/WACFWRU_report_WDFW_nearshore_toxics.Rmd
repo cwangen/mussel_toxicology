@@ -649,6 +649,12 @@ qqline(unlist(ranef(PC_LMM)))
 
 ## Power analyses
 
+The best supported models are near singular with respect to estimating the interaction of year and LIO, and this confounds our ability to assess the power to detect meaningful changes across years. To address this, we removed the interaction term from each model and refit them before estimating power. After doing so, the power to detect differences among years is very high (95-100%), but importantly, this should not be confounded with the power to detect long-term changes over time $per$ $se$. That is, in this case the high power indicates that one could estimate the difference between any two years, whether or not they occurred sequentially in time.
+
+### PAH
+
+Here is the power calculation for `year`.
+
 ```{r power_PAH, cache = TRUE}
 #### PAH ####
 PA_LMM_2 <- lmer(log(dry_value) ~
@@ -663,6 +669,10 @@ PA_LMM_2 <- lmer(log(dry_value) ~
 powerSim(PA_LMM_2, nsim = 100, progress = FALSE)
 ```
 
+### PBDE
+
+Here is the power calculation for `year`.
+
 ```{r power_PBDE, cache = TRUE}
 #### PBDEs ####
 PB_LMM_2 <- lmer(log(dry_value) ~
@@ -676,6 +686,10 @@ PB_LMM_2 <- lmer(log(dry_value) ~
 
 powerSim(PB_LMM_2, nsim = 100, progress = FALSE)
 ```
+
+### PCB
+
+Here is the power calculation for `year`.
 
 ```{r power_PCB, cache = TRUE}
 #### PCBs ####
@@ -692,9 +706,12 @@ powerSim(PC_LMM_2, nsim = 100, progress = FALSE)
 ```
 
 
-# Toxics in the Nearshore Recommendation
+# Summary
 
- 
+Our modeling suggests that the mean percent of impervious surface explains a large proportion of the variance in PAHs, PBDEs, and PCBs. The interactive effects of year and LIO also appear important, suggesting shifts in the distributions of analyte concentrations over time. However, the best supported models have limited power to detect meaningful changes in analytes over time.
+
+When we fit reduced forms of the models that omitted the important interaction of year and LIO, we found that there is very high power to detect differences among any two years in the data set, but that it does not equate to an ability to detect long-term changes across years.
+
 
 # Acknowledgments
 
