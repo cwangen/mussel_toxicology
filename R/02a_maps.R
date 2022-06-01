@@ -81,7 +81,9 @@ PA_df <- PA_df[complete.cases(PA_df),]
 
 # Load Puget Sound map
 #mapPS <- readRDS("mapPS.rds")
- mapPS <- readRDS("./R/mapPS.rds")
+
+map_spot <- here("R","mapPS.rds")
+mapPS <- readRDS(map_spot)
 
 #### base map of Puget Sound ####
 
