@@ -1,26 +1,32 @@
 ---
-title: "A Retrospective Analysis of Mussel Monitoring for Nearshore Toxics in Puget Sound"
-subtitle: "\\textit{Draft Report}"
+title: A Retrospective Analysis of Mussel Monitoring for Nearshore Toxics in Puget
+  Sound
 author:
-  - name: Catherine Wangen
-    email: 'cwangen@uw.edu'
-    institute: [qerm]
-    correspondence: true
-  - name: Mark D. Scheuerell
-    email: 'scheuerl@uw.edu'
-    institute: [wacfwru]
-    correspondence: true
-institute:
-  - qerm: Quantitative Ecology and Resource Management, University of Washington, Seattle, WA
-  - wacfwru: U.S. Geological Survey Washington Cooperative Fish and Wildlife Research Unit, School of Aquatic and Fishery Sciences, University of Washington, Seattle, WA
+- name: Catherine Wangen
+  email: cwangen@uw.edu
+  institute: qerm
+  correspondence: yes
+- name: Mark D. Scheuerell
+  email: scheuerl@uw.edu
+  institute: wacfwru
+  correspondence: yes
+subtitle: \textit{Draft Report}
 output:
+  html_document:
+    df_print: paged
   pdf_document:
     highlight: haddock
     fig_caption: yes
-    number_sections: true
+    number_sections: yes
     pandoc_args:
-      - '--lua-filter=scholarly-metadata.lua'
-      - '--lua-filter=author-info-blocks.lua'
+    - --lua-filter=scholarly-metadata.lua
+    - --lua-filter=author-info-blocks.lua
+institute:
+- qerm: Quantitative Ecology and Resource Management, University of Washington, Seattle,
+    WA
+- wacfwru: U.S. Geological Survey Washington Cooperative Fish and Wildlife Research
+    Unit, School of Aquatic and Fishery Sciences, University of Washington, Seattle,
+    WA
 documentclass: article
 geometry: margin=1in
 linestretch: 1.1
@@ -164,10 +170,12 @@ knitr::include_graphics(here(outputs,"PCB_map.png"))
 
 ```{r rain_PAH_year, , fig.cap = "\\label{fig:rain_PAH_year}Distribution of the log concentration of PAHs across years."}
 PA_df %>% 
-  ggplot(aes(x = year, y = log10(dry_value))) +
+  ggplot(aes(x = year, y = dry_value)) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
+    scale_y_continuous(trans='log10')+
   geom_boxplot(width = .1, outlier.shape = NA) +
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
+
   theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("Year") +
   ylab("log10(dry value)")+
@@ -176,7 +184,8 @@ PA_df %>%
 
 ```{r rain_PAH_LIO, , fig.cap = "\\label{fig:rain_PAH_LIO}Distribution of the log concentration of PAHs across LIOs."}
 PA_df %>% 
-  ggplot(aes(x = lio_areas, y = log10(dry_value))) +
+  ggplot(aes(x = lio_areas, y = dry_value)) +
+  scale_y_continuous(trans='log10')+
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+  theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
@@ -187,7 +196,8 @@ PA_df %>%
 
 ```{r rain_PBDE_year, , fig.cap = "\\label{fig:rain_PBDE_year}Distribution of the log concentration of PBDEs across years."}
 PB_df %>% 
-  ggplot(aes(x = year, y = log10(dry_value))) +
+  ggplot(aes(x = year, y = dry_value)) +
+  scale_y_continuous(trans='log10')+
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
@@ -199,7 +209,8 @@ PB_df %>%
 
 ```{r rain_PBDE_LIO, , fig.cap = "\\label{fig:rain_PBDE_LIO}Distribution of the log concentration of PBDEs across LIOs."}
 PB_df %>% 
-  ggplot(aes(x = lio_areas, y = log10(dry_value))) +
+  ggplot(aes(x = lio_areas, y = dry_value)) +
+  scale_y_continuous(trans='log10')+
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
@@ -211,7 +222,8 @@ PB_df %>%
 
 ```{r rain_PCB_year, , fig.cap = "\\label{fig:rain_PCB_year}Distribution of the log concentration of PCBs across years."}
 PC_df %>% 
-  ggplot(aes(x = year, y = log10(dry_value))) +
+  ggplot(aes(x = year, y = dry_value)) +
+  scale_y_continuous(trans='log10')+
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
@@ -223,7 +235,8 @@ ggtitle("PCBs Across Years")
 
 ```{r rain_PCB_LIO, , fig.cap = "\\label{fig:rain_PCB_LIO}Distribution of the log concentration of PCBs across LIOs."}
 PC_df %>% 
-  ggplot(aes(x = lio_areas, y = log10(dry_value))) +
+  ggplot(aes(x = lio_areas, y = dry_value)) +
+  scale_y_continuous(trans='log10')+
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
   geom_boxplot(width = .1, outlier.shape = NA) +
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
@@ -750,7 +763,8 @@ plot_list = list()
 for (i in unique(PA_df$wria_nr)){
   wria_subset <- PA_df[PA_df$wria_nr==i,]
   p = wria_subset %>%
-    ggplot(aes(x = year, y = log10(dry_value))) +
+    ggplot(aes(x = year, y = dry_value)) +
+      scale_y_continuous(trans='log10')+
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
     ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1) +
@@ -776,7 +790,8 @@ plot_list = list()
 for (i in unique(PB_df$wria_nr)){
   wria_subset <- PB_df[PB_df$wria_nr==i,]
   p = wria_subset %>%
-    ggplot(aes(x = year, y = log10(dry_value))) +
+    ggplot(aes(x = year, y = dry_value)) +
+      scale_y_continuous(trans='log10')+
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
     ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1) +
@@ -803,7 +818,8 @@ plot_list = list()
 for (i in unique(PC_df$wria_nr)){
   wria_subset <- PC_df[PC_df$wria_nr==i,]
   p = wria_subset %>%
-    ggplot(aes(x = year, y = log10(dry_value))) +
+    ggplot(aes(x = year, y = dry_value)) +
+      scale_y_continuous(trans='log10')+
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     geom_boxplot(width = .1, outlier.shape = NA) +
     ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1) +
