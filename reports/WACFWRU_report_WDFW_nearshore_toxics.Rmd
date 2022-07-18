@@ -84,6 +84,26 @@ mussel_df <- read_csv(here(clean_data_dir, totals), show_col_types = FALSE)
 #abs of dry value for now (note below)
 mussel_df$dry_value <- abs(mussel_df$dry_value)
 
+#order WRIAs and LIOS
+mussel_df$lio_areas <- factor(mussel_df$lio_areas, levels = c("Whatcom",
+                                                              "San Juan",
+                                                              "Skagit / Samish",
+                                                              "Island",
+                                                              "Strait of Juan de Fuca",
+                                                              "Snohomish / Stillaguamish Island",
+                                                              "Hood Canal",
+                                                              "West Sound",
+                                                              "South Central",
+                                                              "South Sound",
+                                                              "Puyallup / White"))
+
+mussel_df$wria_nr <- factor(mussel_df$wria_nr,levels = c("1", "2", "3","6", "5",
+                                                         "18","19" ,
+                                                         "17","15", 
+                                                          "7", "8", "9","14","16",
+                                                          "22","13","12","10", "11", 
+                                                          "24"))
+
 #as category
 mussel_df$year <- as.factor(mussel_df$year)
 mussel_df$wria_nr <- as.factor(mussel_df$wria_nr)
@@ -173,7 +193,7 @@ PA_df %>%
   ggplot(aes(x = year, y = dry_value)) +
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
     scale_y_continuous(trans='log10')+
-  geom_boxplot(width = .1, outlier.shape = NA) +
+  geom_boxplot(width = .1, outlier.shape = NA) + coord_flip()+ coord_flip()+
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
 
   theme(axis.text.x=element_text(angle=270,hjust=1)) +
@@ -187,7 +207,7 @@ PA_df %>%
   ggplot(aes(x = lio_areas, y = dry_value)) +
   scale_y_continuous(trans='log10')+
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
-  geom_boxplot(width = .1, outlier.shape = NA) +
+  geom_boxplot(width = .1, outlier.shape = NA) + coord_flip()+
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+  theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
   xlab("LIO Area") +
   ylab("log10(dry value)")+
@@ -199,7 +219,7 @@ PB_df %>%
   ggplot(aes(x = year, y = dry_value)) +
   scale_y_continuous(trans='log10')+
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
-  geom_boxplot(width = .1, outlier.shape = NA) +
+  geom_boxplot(width = .1, outlier.shape = NA) + coord_flip()+
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
   theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("Year") +
@@ -212,7 +232,7 @@ PB_df %>%
   ggplot(aes(x = lio_areas, y = dry_value)) +
   scale_y_continuous(trans='log10')+
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
-  geom_boxplot(width = .1, outlier.shape = NA) +
+  geom_boxplot(width = .1, outlier.shape = NA) + coord_flip()+
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
    theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
   xlab("LIO Area") +
@@ -225,7 +245,7 @@ PC_df %>%
   ggplot(aes(x = year, y = dry_value)) +
   scale_y_continuous(trans='log10')+
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
-  geom_boxplot(width = .1, outlier.shape = NA) +
+  geom_boxplot(width = .1, outlier.shape = NA) + coord_flip()+
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1) +
 theme(axis.text.x=element_text(angle=270,hjust=1)) +
   xlab("Year") +
@@ -238,7 +258,7 @@ PC_df %>%
   ggplot(aes(x = lio_areas, y = dry_value)) +
   scale_y_continuous(trans='log10')+
   ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
-  geom_boxplot(width = .1, outlier.shape = NA) +
+  geom_boxplot(width = .1, outlier.shape = NA) + coord_flip()+
   ggdist::stat_dots(side = "left", dotsize = .1, justification = 1.1, binwidth = .1)+
   theme(axis.text.x=element_text(angle=315,hjust = 0.01)) +
   xlab("LIO Area") +
@@ -760,13 +780,17 @@ Here are additional plots of the distribution of analytes across WRIA and time.
 
 #PAH LIO plots
 plot_list = list()
-for (i in unique(PA_df$wria_nr)){
+for (i in c("1", "2", "3","6",
+                                                         "18",
+                                                         "17","15", 
+                                                          "8", "9","14","16",
+                                                          "13","12","10", "11")){
   wria_subset <- PA_df[PA_df$wria_nr==i,]
   p = wria_subset %>%
     ggplot(aes(x = year, y = dry_value)) +
       scale_y_continuous(trans='log10')+
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
-    geom_boxplot(width = .1, outlier.shape = NA) +
+    geom_boxplot(width = .1, outlier.shape = NA) + coord_flip()+
     ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1) +
     ggtitle(paste("PAHs - WRIA #",i)) +
     # theme(axis.text.x=element_text(angle=270,hjust=1)) +
@@ -787,13 +811,17 @@ print(plot_list)
 
 # PBDE WRIA plots
 plot_list = list()
-for (i in unique(PB_df$wria_nr)){
+for (i in c("1", "2", "3","6",
+                                                         "18",
+                                                         "17","15", 
+                                                          "8", "9","14","16",
+                                                          "13","12","10", "11")){
   wria_subset <- PB_df[PB_df$wria_nr==i,]
   p = wria_subset %>%
     ggplot(aes(x = year, y = dry_value)) +
       scale_y_continuous(trans='log10')+
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
-    geom_boxplot(width = .1, outlier.shape = NA) +
+    geom_boxplot(width = .1, outlier.shape = NA) + coord_flip()+
     ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1) +
     ggtitle(paste("PBDEs - WRIA #",i)) +
     # theme(axis.text.x=element_text(angle=270,hjust=1)) +
@@ -815,13 +843,17 @@ print(plot_list)
 
 # PCB WRIA plots
 plot_list = list()
-for (i in unique(PC_df$wria_nr)){
+for (i in c("1", "2", "3","6",
+                                                         "18",
+                                                         "17","15", 
+                                                          "8", "9","14","16",
+                                                          "13","12","10", "11")){
   wria_subset <- PC_df[PC_df$wria_nr==i,]
   p = wria_subset %>%
     ggplot(aes(x = year, y = dry_value)) +
       scale_y_continuous(trans='log10')+
     ggdist::stat_halfeye(adjust = .5, width = .3, .width = 0, justification = -.3, point_colour = NA) + 
-    geom_boxplot(width = .1, outlier.shape = NA) +
+    geom_boxplot(width = .1, outlier.shape = NA) + coord_flip()+
     ggdist::stat_dots(side = "left", dotsize = .05, justification = 1.1, binwidth = .1) +
     ggtitle(paste("PCBs - WRIA #",i)) +
     # theme(axis.text.x=element_text(angle=270,hjust=1)) +
