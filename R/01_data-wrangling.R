@@ -97,9 +97,9 @@ mussel_df$site_name <- stri_replace_all_regex(mussel_df$site_name,
                                               vectorize = FALSE)
 
  
-#insert Penn Cove lat and lon
-mussel_df$latitude[is.na(mussel_df$latitude)] <-  48.218626
-mussel_df$longitude[is.na(mussel_df$longitude)] <- -122.707972
+#insert Penn Cove lat and lon (later spreadsheets include this already)
+#mussel_df$latitude[is.na(mussel_df$latitude)] <-  48.218626
+#mussel_df$longitude[is.na(mussel_df$longitude)] <- -122.707972
 
 #### create additional columns ####
 
@@ -119,6 +119,32 @@ mussel_df$dry_value <- abs(mussel_df$dry_value)
 
 #add column with days sample spent in field
 mussel_df$time <- difftime(mussel_df$retrieval_date, mussel_df$deployment_date)
+
+#label Penn Cove Reference Samples in LIO/WRIA Column 
+
+PennCove <- c("Penn Cove Reference",
+  "Penn Cove, Pre-test Baseline",
+  "Penn Cove, Pre-test Baseline 1",
+  "Penn Cove, Pre-test Baseline 2",
+  "Penn Cove, Pre-test Baseline 3",
+  "Penn Cove, Pre-test Baseline 4",
+  "Penn Cove, Pre-test Baseline 5",
+  "Penn Cove, Pre-test Baseline 6",
+  "Penn Cove Baseline #1",
+  "Penn Cove Baseline #2",
+  "Penn Cove Baseline #3")
+
+for (i in 1:length(PennCove))
+  {
+  a = PennCove[i]
+  mussel_df[mussel_df$site_name == a, which( colnames(mussel_df)=="lio_areas" )] <- "Penn Cove Reference"
+}
+
+for (i in 1:length(PennCove))
+{
+  a = PennCove[i]
+  mussel_df[mussel_df$site_name == a, which( colnames(mussel_df)=="wria_nr" )] <- "Penn Cove Reference"
+}
 
 #### write data ####
 mussel_df %>%
