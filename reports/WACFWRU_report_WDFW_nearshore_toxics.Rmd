@@ -85,24 +85,14 @@ mussel_df <- read_csv(here(clean_data_dir, totals), show_col_types = FALSE)
 mussel_df$dry_value <- abs(mussel_df$dry_value)
 
 #order WRIAs and LIOS
-mussel_df$lio_areas <- factor(mussel_df$lio_areas, levels = c("Whatcom",
-                                                              "San Juan",
-                                                              "Skagit / Samish",
-                                                              "Island",
-                                                              "Strait of Juan de Fuca",
-                                                              "Snohomish / Stillaguamish Island",
-                                                              "Hood Canal",
-                                                              "West Sound",
-                                                              "South Central",
-                                                              "South Sound",
-                                                              "Puyallup / White"))
+mussel_df$lio_areas <- factor(mussel_df$lio_areas, levels = c("South Sound", "Puyallup / White", "South Central", "West Sound", "Hood Canal",  "Snohomish / Stillaguamish", "Island", "Strait of Juan de Fuca", "Skagit / Samish", "San Juan", "Whatcom"))
 
-mussel_df$wria_nr <- factor(mussel_df$wria_nr,levels = c("1", "2", "3","6", "5",
+mussel_df$wria_nr <- factor(mussel_df$wria_nr,levels = rev(c("1", "2", "3","6", "5",
                                                          "18","19" ,
                                                          "17","15", 
                                                           "7", "8", "9","14","16",
                                                           "22","13","12","10", "11", 
-                                                          "24"))
+                                                          "24")))
 
 #as category
 mussel_df$year <- as.factor(mussel_df$year)
@@ -110,7 +100,10 @@ mussel_df$wria_nr <- as.factor(mussel_df$wria_nr)
 mussel_df$lio_areas <- as.factor(mussel_df$lio_areas)
 
 #remove Penn Cove reference samples
-mussel_df <- mussel_df[!is.na(mussel_df$fund_source),]
+#mussel_df <- mussel_df[!is.na(mussel_df$fund_source),]
+#Penn Cove Reference samples have had LIO and WRIA changed to "Penn Cove Refernce"
+
+
 mussel_df <- subset(mussel_df, site_name != "Penn Cove Reference")
 
 #remove samples from outside Puget sound
@@ -753,6 +746,36 @@ We acknowledge the help and support from the environmental toxicology group at W
 \newpage
 
 # Appendix
+
+## Pairwise t-test tables
+
+## Pairwise t-test tables
+
+```{r param_summary_tables}
+
+kable(tidy((pairwise.t.test(PA_df$dry_value, PA_df$wria_nr, "none"))), digits = 2,
+      caption = "Pairwise t-statistics by WRIA for PAHs.")
+
+kable(tidy((pairwise.t.test(PB_df$dry_value, PB_df$wria_nr, "none"))), digits = 2,
+      caption = "Pairwise t-statistics by WRIA for PBDEs.")
+
+kable(tidy((pairwise.t.test(PC_df$dry_value, PC_df$wria_nr, "none"))), digits = 2,
+      caption = "Pairwise t-statistics by WRIA for PCBs.")
+
+```
+
+```{r param_summary_tables}
+
+kable(tidy((pairwise.t.test(PA_df$dry_value, PA_df$lio_areas, "none"))), digits = 2,
+      caption = "Pairwise t-statistics by LIO for PAHs.")
+
+kable(tidy((pairwise.t.test(PB_df$dry_value, PB_df$lio_areas, "none"))), digits = 2,
+      caption = "Pairwise t-statistics by LIO for PBDEs.")
+
+kable(tidy((pairwise.t.test(PC_df$dry_value, PC_df$lio_areas, "none"))), digits = 2,
+      caption = "Pairwise t-statistics by LIO for PCBs.")
+
+```
 
 ## Parameter summary tables
 
