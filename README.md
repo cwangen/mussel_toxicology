@@ -1,5 +1,5 @@
 # mussel_toxics  (as of 8/16/22)
-A repo containing data and analysis of mussel toxicology data from the Puget Sound. The main repo contains a .gitignore file that has exceptions for the outputs and reports folders, as well as a license, and .Rproj file, and this README.md.
+A repo containing data and analysis of mussel toxicology data from the Puget Sound. The main repo contains a .gitignore file that has exceptions for the outputs and reports folders, as well as a license, .Rproj file, and this README.md.
 
 # Summary by Folder
 
