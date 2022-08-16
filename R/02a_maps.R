@@ -1,5 +1,3 @@
-#### code for maps only - I don't think it runs currently ####
-
 #### Setup ####
 
 library(MASS)
