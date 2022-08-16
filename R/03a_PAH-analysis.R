@@ -51,42 +51,6 @@ PA_df <- mussel_df %>%
   filter(mussel_df$analyte == "SumPAHs16")
 PA_df <- PA_df[complete.cases(PA_df),]
 
-
-
-
-#### Fit model with RE for lat and lon and plots ####
-PA_LMM <- lmer(log(dry_value) ~
-                 year +
-                 time +
-                 mean_is_au +
-               year:lio_areas +
-                 (1|longitude),
-               data = PA_df)
-
-
-
-#### QQ plots ####
-## set plot area
-par(mai = c(0.9, 0.9, 0.6, 0.1),
-    omi = c(0, 0, 0, 0),
-    mfrow = c(1,3), cex.lab = 1.2)
-
-## residuals vs fitted
-plot(fitted(PA_LMM), residuals(PA_LMM), las = 1, pch = 1,
-     xlab = "Fitted", ylab = "Residuals",
-     main = "Residuals vs Fitted")
-abline(h=0, lty = "dashed")
-
-
-## residuals
-qqnorm(residuals(PA_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
-qqline(residuals(PA_LMM))
-
-## Random effects
-qqnorm(unlist(ranef(PA_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
-qqline(unlist(ranef(PA_LMM)))
-
-
 #### subregion things ####
 table(PA_df$year)
 table(PA_df$year, PA_df$lio_areas)

@@ -52,41 +52,6 @@ PC_df <- mussel_df %>%
 PC_df <- PC_df[complete.cases(PC_df),]
 
 
-
-
-#### Fit model with RE for lat and lon and plots ####
-PC_LMM <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|longitude),
-               data = PC_df)
-
-
-
-#### QQ plots ####
-## set plot area
-par(mai = c(0.9, 0.9, 0.6, 0.1),
-    omi = c(0, 0, 0, 0),
-    mfrow = c(1,3), cex.lab = 1.2)
-
-## residuals vs fitted
-plot(fitted(PC_LMM), residuals(PC_LMM), las = 1, pch = 1,
-     xlab = "Fitted", ylab = "Residuals",
-     main = "Residuals vs Fitted")
-abline(h=0, lty = "dashed")
-
-
-## residuals
-qqnorm(residuals(PC_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
-qqline(residuals(PC_LMM))
-
-## Random effects
-qqnorm(unlist(ranef(PC_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
-qqline(unlist(ranef(PC_LMM)))
-
-
 #### subregion things ####
 table(PC_df$year)
 table(PC_df$year, PC_df$lio_areas)
