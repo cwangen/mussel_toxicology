@@ -21,6 +21,7 @@ mussel <- "2013-20MusselCagesPOPsPAHs_Cnty_WRIA_LIO_Coverages.xlsx"
 ##load excel sheet
 mussel_df <- here(raw_data_dir, mussel) %>%
   read_xlsx(sheet = 1)
+
 #lipid totals
 lipids_df <- here(raw_data_dir, mussel) %>%
   read_xlsx(sheet = 1)
@@ -120,31 +121,45 @@ mussel_df$dry_value <- abs(mussel_df$dry_value)
 #add column with days sample spent in field
 mussel_df$time <- difftime(mussel_df$retrieval_date, mussel_df$deployment_date)
 
-#label Penn Cove Reference Samples in LIO/WRIA Column 
+#label Penn Cove Reference Samples in LIO/WRIA Column
 
-PennCove <- c("Penn Cove Reference",
-  "Penn Cove, Pre-test Baseline",
-  "Penn Cove, Pre-test Baseline 1",
-  "Penn Cove, Pre-test Baseline 2",
-  "Penn Cove, Pre-test Baseline 3",
-  "Penn Cove, Pre-test Baseline 4",
-  "Penn Cove, Pre-test Baseline 5",
-  "Penn Cove, Pre-test Baseline 6",
-  "Penn Cove Baseline #1",
-  "Penn Cove Baseline #2",
-  "Penn Cove Baseline #3")
+#turn WRIA to character
+
+mussel_df$wria_nr <- as.character(mussel_df$wria_nr)
+
+
+PennCove <- c("Penn Cove Reference")
+a = PennCove[1]
+
+mussel_df[mussel_df$site_name == a, which( colnames(mussel_df)=="lio_areas" )] <- "Penn Cove Reference"
+
+
+mussel_df[mussel_df$site_name == a, which( colnames(mussel_df)=="wria_nr" )] <- "Penn Cove Reference"
+
+
+PennCove <- c("Penn Cove, Pre-test Baseline",
+              "Penn Cove, Pre-test Baseline 1",
+              "Penn Cove, Pre-test Baseline 2",
+              "Penn Cove, Pre-test Baseline 3",
+              "Penn Cove, Pre-test Baseline 4",
+              "Penn Cove, Pre-test Baseline 5",
+              "Penn Cove, Pre-test Baseline 6",
+              "Penn Cove Baseline #1",
+              "Penn Cove Baseline #2",
+              "Penn Cove Baseline #3")
 
 for (i in 1:length(PennCove))
-  {
+{
   a = PennCove[i]
-  mussel_df[mussel_df$site_name == a, which( colnames(mussel_df)=="lio_areas" )] <- "Penn Cove Reference"
+  mussel_df[mussel_df$site_name == a, which( colnames(mussel_df)=="lio_areas" )] <- "Penn Cove Baseline"
 }
 
 for (i in 1:length(PennCove))
 {
   a = PennCove[i]
-  mussel_df[mussel_df$site_name == a, which( colnames(mussel_df)=="wria_nr" )] <- "Penn Cove Reference"
+  mussel_df[mussel_df$site_name == a, which( colnames(mussel_df)=="wria_nr" )] <- "Penn Cove Baseline"
 }
+
 
 #### write data ####
 mussel_df %>%
