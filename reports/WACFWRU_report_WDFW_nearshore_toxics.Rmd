@@ -85,29 +85,29 @@ mussel_df <- read_csv(here(clean_data_dir, totals), show_col_types = FALSE)
 mussel_df$dry_value <- abs(mussel_df$dry_value)
 
 #order WRIAs and LIOS
-mussel_df$lio_areas <- factor(mussel_df$lio_areas, levels = c("South Sound", "Puyallup / White", "South Central", "West Sound", "Hood Canal",  "Snohomish / Stillaguamish", "Island", "Strait of Juan de Fuca", "Skagit / Samish", "San Juan", "Whatcom"))
+mussel_df$lio_areas <- factor(mussel_df$lio_areas, levels = c("Penn Cove Baseline","South Sound", "Puyallup / White", "South Central", "West Sound", "Hood Canal",  "Snohomish / Stillaguamish", "Island", "Strait of Juan de Fuca", "Skagit / Samish", "San Juan", "Whatcom", "Penn Cove Reference"))
 
 mussel_df$wria_nr <- factor(mussel_df$wria_nr,levels = rev(c("1", "2", "3","6", "5",
                                                          "18","19" ,
                                                          "17","15", 
                                                           "7", "8", "9","14","16",
                                                           "22","13","12","10", "11", 
-                                                          "24")))
+                                                          "24", "Penn Cove Reference","Penn Cove Baseline")))
 
 #as category
 mussel_df$year <- as.factor(mussel_df$year)
 mussel_df$wria_nr <- as.factor(mussel_df$wria_nr)
 mussel_df$lio_areas <- as.factor(mussel_df$lio_areas)
 
-#remove Penn Cove reference samples
-#mussel_df <- mussel_df[!is.na(mussel_df$fund_source),]
-#Penn Cove Reference samples have had LIO and WRIA changed to "Penn Cove Refernce"
-
-
-mussel_df <- subset(mussel_df, site_name != "Penn Cove Reference")
-
-#remove samples from outside Puget sound
-mussel_df <- subset(mussel_df, longitude > -123.5)
+# #remove Penn Cove reference samples
+# #mussel_df <- mussel_df[!is.na(mussel_df$fund_source),]
+# #Penn Cove Reference samples have had LIO and WRIA changed to "Penn Cove Reference"
+# 
+# 
+# mussel_df <- subset(mussel_df, site_name != "Penn Cove Reference")
+# 
+# #remove samples from outside Puget sound
+# mussel_df <- subset(mussel_df, longitude > -123.5)
 
 #create analyte dataframes
 PA_df <- mussel_df %>%
@@ -262,420 +262,30 @@ ggtitle("PCBs Across LIOs")
 
 ## Statistical modeling
 
-We modeled the dry weight of the analytes found in mussels using a linear mixed model (LMM). These models consist of fixed effects, which remain constant, and random effects that follow a normal distribution and can correspondingly vary by individual, location, etc. We considered the following explanatory variables in our analysis: 
+We modeled the dry weight of the analytes found in mussels using a simple linear regression using soak time, impervious surface, and year as variables. This model has the form
 
-* time in days that the mussels spent in the water;
-* latitude and longitude;
-* year (as a fixed factor);
-* county;
-* LIO;
-* WRIA;
-* mean percent AU.
+$$
+\operatorname{dry\_value} = \alpha + \beta_{1}(\operatorname{year}_{\operatorname{2016}}) + \beta_{2}(\operatorname{year}_{\operatorname{2018}}) + \beta_{3}(\operatorname{year}_{\operatorname{2020}}) + \beta_{4}(\operatorname{time}) + \beta_{5}(\operatorname{mean\_is\_au}) + \epsilon
+$$
 
-Other extraneous variables (IE, funding source) were not used as there is no possible relationship between these and analyte content, though this information could be helpful when we begin to focus on future sampling plans. Exploratory analysis of the data allowed us to remove extraneous factors, while including those we wished to investigate. Models were created for each of the analytes independently, as their nature and distribution should not be assumed to be the same.
+```{r}
+PA_lm <- lm(dry_value ~ year + time + mean_is_au ,data = PA_df)
 
-Initial model selection occurred by comparing the Akaike Information Criterion (AIC) of all feasible possible models. Models that were unsuitable due to singular fits (overfitting) or violations or model assumptions such as non-normality were removed. The final model was chosen by taking into account AIC, noninfringement of model assumptions, and variables critical to project goals. 
+PB_lm <- lm(dry_value ~ year + time + mean_is_au ,data = PB_df)
 
-# Results
-
-```{r current final model, warning=FALSE}
-
-#### PAH ####
-PA_LMM <- lmer(log(dry_value) ~
-                 year +
-                 time +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|longitude),
-               data = short_PA_df,
-               na.action = "na.fail")
-
-#### PBDEs ####
-PB_LMM <- lmer(log(dry_value) ~
-                 year +
-                 time +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|longitude),
-               data = short_PB_df,
-               na.action = "na.fail")
-
-#### PCBs ####
-PC_LMM <- lmer(log(dry_value) ~
-                 year +
-                 time +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|longitude),
-               data = short_PC_df,
-               na.action = "na.fail")
+PC_lm <- lm(dry_value ~ year + time + mean_is_au ,data = PC_df)
 ```
 
+```{r}
 
-```{r PA AIC table, warning=FALSE}
 
-PA_liolat <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/latitude) ,
-               data = short_PA_df,
-               na.action = "na.fail")
 
-PA_liolon <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/longitude),
-               data = short_PA_df,
-               na.action = "na.fail")
-
-PA_lio <- lmer(log(dry_value) ~
-                          time +
-                          year +
-                          mean_is_au +
-                          year:lio_areas +
-                          (1|lio_areas),
-                        data = short_PA_df,
-                        na.action = "na.fail")
-
-PA_lat <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|latitude),
-                     data = short_PA_df,
-                     na.action = "na.fail")
-
-PA_lon <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|longitude),
-                     data = short_PA_df,
-                     na.action = "na.fail")
-
-models <- list(PA_liolat,PA_liolon,PA_lio,PA_lat,PA_lon)
-model.names <- c("latitude in LIO",
-                 "longitude in LIO",
-                 "LIO",
-                 "latitude",
-                 "longitude")
-
-table <- suppressWarnings(aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
-table$Modnames <- substring(table$Modnames, 1)
-# table <- table[c("Modnames","AIC","Delta_AIC")]
-# colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
-table <- table[c("Modnames", "Delta_AIC")]
-
-PA_AIC_table <- table
-
-```
-
-
-```{r PB AIC table, warning=FALSE}
-
-PB_liolat <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/latitude) ,
-               data = short_PB_df,
-               na.action = "na.fail")
-
-PB_liolon <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/longitude),
-               data = short_PB_df,
-               na.action = "na.fail")
-
-PB_lio <- lmer(log(dry_value) ~
-                          time +
-                          year +
-                          mean_is_au +
-                          year:lio_areas +
-                          (1|lio_areas),
-                        data = short_PB_df,
-                        na.action = "na.fail")
-
-PB_lat <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|latitude),
-                     data = short_PB_df,
-                     na.action = "na.fail")
-
-PB_lon <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|longitude),
-                     data = short_PB_df,
-                     na.action = "na.fail")
-
-PB_notime <- lmer(log(dry_value) ~
-                      # time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|longitude),
-                     data = short_PB_df,
-                     na.action = "na.fail")
-
-models <- list(PB_liolat,PB_liolon,PB_lio,PB_lat,PB_lon)
-model.names <- c("latitude in LIO",
-                 "longitude in LIO",
-                 "LIO",
-                 "latitude",
-                 "longitude")
-
-table <- suppressWarnings(aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
-table$Modnames <- substring(table$Modnames,1)
-# table <- table[c("Modnames","AIC","Delta_AIC")]
-# colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
-table <- table[c("Modnames", "Delta_AIC")]
-colnames(table) <- c("Random Effect of Model", "Delta AIC")
-
-PB_AIC_table <- table
-
-```
-
-```{r PC AIC table, warning=FALSE}
-
-# does not converge, is not best anyway
-PC_liolat <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/latitude) ,
-               data = short_PC_df,
-               na.action = "na.fail")
-
-PC_liolon <- lmer(log(dry_value) ~
-                 time +
-                 year +
-                 mean_is_au +
-                 year:lio_areas +
-                 (1|lio_areas/longitude),
-               data = short_PC_df,
-               na.action = "na.fail")
-
-PC_lio <- lmer(log(dry_value) ~
-                          time +
-                          year +
-                          mean_is_au +
-                          year:lio_areas +
-                          (1|lio_areas),
-                        data = short_PC_df,
-                        na.action = "na.fail")
-
-PC_lat <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|latitude),
-                     data = short_PC_df,
-                     na.action = "na.fail")
-
-PC_lon <- lmer(log(dry_value) ~
-                       time +
-                       year +
-                       mean_is_au +
-                       year:lio_areas +
-                       (1|longitude),
-                     data = short_PC_df,
-                     na.action = "na.fail")
-
-
-#NOTE THAT LIO/LAT DOES NOT CONVERGE. Which, along with the higher AIC, likely means that RE combo is not good.
-
-models <- list(PC_liolat,PC_liolon,PC_lio,PC_lat,PC_lon)
-model.names <- c("latitude in LIO",
-                 "longitude in LIO",
-                 "LIO",
-                 "latitude",
-                 "longitude")
-
-table <- suppressWarnings(aictab(cand.set = models, modnames = model.names, second.ord = "FALSE"))
-table$Modnames <- substring(table$Modnames,1)
-# table <- table[c("Modnames","AIC","Delta_AIC")]
-# colnames(table) <- c("Random Effect of Model","AIC","Delta AIC")
-table <- table[c("Modnames", "Delta_AIC")]
-colnames(table) <- c("Random Effect of Model", "Delta AIC")
-
-PC_AIC_table <- table
-
-```
-
-## Model selection
-
-Based upon $\Delta$AIC values (Tables 1-3), the model with the most support from the data for all analytes included fixed effects for
-
-* $year$;
-* a $year$ $\times$ $LIO$ interaction;
-* mean percent impervious surface in the adjacent shoreline watershed assessment unit $(AU)$; and
-* number of $days$ the mussels were immersed.
-
-The model also included the random effect of longitude, but not latitude. There was very little evidence to support the inclusion of LIO as a random effect either.
-
-Specifically, the form of the best supported model is
-
-\begin{equation}
-D_{a,i} = \alpha_{a,year} + \gamma_{a,year\times LIO}
-+ \beta_{a}\text{surface}_{a,i} + \tau_{a}\text{time}_{a,i} + \mu_{a,[LIO:lon]} + \epsilon_{a,i}
-\end{equation}
-
-where $D_{a,i}$ is the natural logarithm of the dry weight of analyte $a$ from a sample site $i$, $\alpha_{a,year}$ is the categorical effect of year on analyte $a$, $\gamma_{a,year\times LIO}$ is the interaction effect of year and LIO on analyte $a$, $\beta_{a}$ is the effect of mean percent impervious surface of the nearest watershed region on analyte $a$ from location $i$, $\tau_{a}$ is the effect of the time the mussels remained in the water (which varied by sampling year) at location $i$ for analyte $a$, $\mu_{a,[LIO:lon]}$ is the random effect of longitude nested within LIO on analyte $a$, such that $\mu_{a,[LIO:lon]} \sim \text{N}(0, \sigma_\mu^2)$, and $\epsilon_{a,i}$ is the residual error, which is normally distributed with $\epsilon_{a,i} \sim \text{N}(0, \sigma_\epsilon^2)$. 
-
-
-```{r model_selection}
-kable(PA_AIC_table, digits = 1, caption = "Model selection results for PAHs.",
-  col.names = c("Random effect", "$\\Delta$AIC"),
-  escape = FALSE)
-
-kable(PB_AIC_table, digits = 1, caption = "Model selection results for PBDEs.",
-  col.names = c("Random effect", "$\\Delta$AIC"),
-  escape = FALSE)
-
-kable(PC_AIC_table, digits = 1, caption = "Model selection results for PCBs.",
-  col.names = c("Random effect", "$\\Delta$AIC"),
-  escape = FALSE)
-
-```
-
-## Variable importance
-
-Based upon model sum-of-squares, the mean percent of impervious surface explains a large proportion of the variance in PAHs, PBDEs, and PCBs (Tables 4-6). The interactive effects of year and LIO also appear important, suggesting shifts in the distributions of analyte concentrations over time.
-
-```{r anova_tbl}
-kable(anova(PA_LMM),
-      caption = "ANOVA table for the model of PAHs.",
-      digits = c(0, 1, 1, 2),
-      col.names = c("df", "Sum Sq", "Mean Sq", "F-value"),
-      escape = FALSE)
-
-kable(anova(PB_LMM), caption = "ANOVA table for the model of PBDEs.",
-      digits = c(0, 1, 1, 2),
-      col.names = c("df", "Sum Sq", "Mean Sq", "F-value"),
-      escape = FALSE)
-
-# kable(anova(PB_LMM,PB_notime))
-
-kable(anova(PC_LMM), caption = "ANOVA table for the model of PCBs.",
-      digits = c(0, 1, 1, 2),
-      col.names = c("df", "Sum Sq", "Mean Sq", "F-value"),
-      escape = FALSE)
-
-```
-
-
-## Parameter estimates
-
-Parameter estimates and their associate 95% confidence intervals from the best supported models are provided in the following tables. Additional information about the model parameters is provided in the Appendix.
-
-```{r param_est_tbl}
-gtsummary::as_kable(gtsummary::tbl_regression(PA_LMM, tidy_fun = broom.mixed::tidy),
-                    caption = "Parameter estimates and 95% confidence intervals for the model of PAHs.")
-
-gtsummary::as_kable(gtsummary::tbl_regression(PB_LMM, tidy_fun = broom.mixed::tidy),
-                    caption = "Parameter estimates and 95% confidence intervals for the model of PBDEs.")
-
-gtsummary::as_kable(gtsummary::tbl_regression(PC_LMM, tidy_fun = broom.mixed::tidy),
-                    caption = "Parameter estimates and 95% confidence intervals for the model of PCBs.")
-
-```
-
-
-## Model diagnostics
-
-In general, models met the assumptions of well-behaved, independent, and identical errors (Figures \ref{fig:PAdiags} - \ref{fig:PCdiags}), but there was some indication of remaining information in the residuals for the model of PAHs (Figure \ref{fig:PAdiags}). Although there was some indication of heavy-tailed (leptokurtic) residuals, the Q-Q plots looked quite reasonable overall.
-
-```{r PAdiags, fig.dim = c(7,3), fig.cap = "\\label{fig:PAdiags}Model diagnostics for the top ranked model for PAHs."}
-
-#### QQ plots ####
-## set plot area
-par(mai = c(0.9, 0.9, 0.6, 0.1),
-    omi = c(0, 0, 0, 0),
-    mfrow = c(1,3), cex.lab = 1.2)
-
-## residuals vs fitted
-plot(fitted(PA_LMM), residuals(PA_LMM), las = 1, pch = 1,
-     xlab = "Fitted", ylab = "Residuals",
-     main = "Residuals vs Fitted")
-abline(h=0, lty = "dashed")
-
-## residuals
-qqnorm(residuals(PA_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
-qqline(residuals(PA_LMM))
-
-## Random effects
-qqnorm(unlist(ranef(PA_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
-qqline(unlist(ranef(PA_LMM)))
-```
-
-```{r PBdiags, fig.dim = c(7,3), fig.cap = "\\label{fig:PBdiags}Model diagnostics for the top ranked model for PBDEs."}
-
-#### QQ plots ####
-## set plot area
-par(mai = c(0.9, 0.9, 0.6, 0.1),
-    omi = c(0, 0, 0, 0),
-    mfrow = c(1,3), cex.lab = 1.2)
-
-## residuals vs fitted
-plot(fitted(PB_LMM), residuals(PB_LMM), las = 1, pch = 1,
-     xlab = "Fitted", ylab = "Residuals",
-     main = "Residuals vs Fitted")
-abline(h=0, lty = "dashed")
-
-## residuals
-qqnorm(residuals(PB_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
-qqline(residuals(PB_LMM))
-
-## Random effects
-qqnorm(unlist(ranef(PB_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
-qqline(unlist(ranef(PB_LMM)))
-```
-
-```{r PCdiags, fig.dim = c(7,3), fig.cap = "\\label{fig:PCdiags}Model diagnostics for the top ranked model for PCBs."}
-
-#### QQ plots ####
-## set plot area
-par(mai = c(0.9, 0.9, 0.6, 0.1),
-    omi = c(0, 0, 0, 0),
-    mfrow = c(1,3), cex.lab = 1.2)
-
-## residuals vs fitted
-plot(fitted(PC_LMM), residuals(PC_LMM), las = 1, pch = 1,
-     xlab = "Fitted", ylab = "Residuals",
-     main = "Residuals vs Fitted")
-abline(h=0, lty = "dashed")
-
-## residuals
-qqnorm(residuals(PC_LMM), main = "QQ plot (residuals)", las = 1, pch = 1)
-qqline(residuals(PC_LMM))
-
-## Random effects
-qqnorm(unlist(ranef(PC_LMM)), main = "QQ plot (RE's)", las = 1, pch = 1)
-qqline(unlist(ranef(PC_LMM)))
 ```
 
 
 ## Power analyses
 
-The best supported models are near singular with respect to estimating the interaction of year and LIO, and this confounds our ability to assess the power to detect meaningful changes across years. To address this, we removed the interaction term from each model and refit them before estimating power. After doing so, the power to detect differences among years is very high (95-100%), but importantly, this should not be confounded with the power to detect long-term changes over time $per$ $se$. That is, in this case the high power indicates that one could estimate the difference between any two years, whether or not they occurred sequentially in time.
+The power to detect differences among years is very high (95-100%), but importantly, this should not be confounded with the power to detect long-term changes over time $per$ $se$. That is, in this case the high power indicates that one could estimate the difference between any two years, whether or not they occurred sequentially in time.
 
 ### PAH
 
@@ -683,16 +293,8 @@ Here is the power calculation for `year`.
 
 ```{r power_PAH, cache = TRUE}
 #### PAH ####
-PA_LMM_2 <- lmer(log(dry_value) ~
-                 year +
-                 time +
-                 mean_is_au +
-                 lio_areas +
-                 (1|longitude),
-               data = short_PA_df,
-               na.action = "na.fail")
 
-powerSim(PA_LMM_2, nsim = 100, progress = FALSE)
+powerSim(PA_lm, nsim = 100, progress = FALSE)
 ```
 
 ### PBDE
@@ -701,16 +303,7 @@ Here is the power calculation for `year`.
 
 ```{r power_PBDE, cache = TRUE}
 #### PBDEs ####
-PB_LMM_2 <- lmer(log(dry_value) ~
-                 year +
-                 time +
-                 mean_is_au +
-                 lio_areas +
-                 (1|longitude),
-               data = short_PB_df,
-               na.action = "na.fail")
-
-powerSim(PB_LMM_2, nsim = 100, progress = FALSE)
+powerSim(PA_lm, nsim = 100, progress = FALSE)
 ```
 
 ### PCB
@@ -719,24 +312,13 @@ Here is the power calculation for `year`.
 
 ```{r power_PCB, cache = TRUE}
 #### PCBs ####
-PC_LMM_2 <- lmer(log(dry_value) ~
-                 year +
-                 time +
-                 mean_is_au +
-                 lio_areas +
-                 (1|longitude),
-               data = short_PC_df,
-               na.action = "na.fail")
-
-powerSim(PC_LMM_2, nsim = 100, progress = FALSE)
+powerSim(PC_lm, nsim = 100, progress = FALSE)
 ```
 
 
 # Summary
 
-Our modeling suggests that the mean percent of impervious surface explains a large proportion of the variance in PAHs, PBDEs, and PCBs. The interactive effects of year and LIO also appear important, suggesting shifts in the distributions of analyte concentrations over time. However, the best supported models have limited power to detect meaningful changes in analytes over time.
-
-When we fit reduced forms of the models that omitted the important interaction of year and LIO, we found that there is very high power to detect differences among any two years in the data set, but that it does not equate to an ability to detect long-term changes across years.
+Our modeling suggests that the mean percent of impervious surface explains a large proportion of the variance in PAHs, PBDEs, and PCBs. The interactive effects of year and LIO also appear important, suggesting shifts in the distributions of analyte concentrations over time. However, the best supported models have limited power to detect meaningful changes in analytes over time. We found that there is very high power to detect differences among any two years in the data set, but that it does not equate to an ability to detect long-term changes across years.
 
 
 # Acknowledgments
@@ -747,11 +329,10 @@ We acknowledge the help and support from the environmental toxicology group at W
 
 # Appendix
 
-## Pairwise t-test tables
 
 ## Pairwise t-test tables
 
-```{r param_summary_tables}
+```{r param_summary_tables2}
 
 kable(tidy((pairwise.t.test(PA_df$dry_value, PA_df$wria_nr, "none"))), digits = 2,
       caption = "Pairwise t-statistics by WRIA for PAHs.")
@@ -764,7 +345,7 @@ kable(tidy((pairwise.t.test(PC_df$dry_value, PC_df$wria_nr, "none"))), digits = 
 
 ```
 
-```{r param_summary_tables}
+```{r param_summary_tables3}
 
 kable(tidy((pairwise.t.test(PA_df$dry_value, PA_df$lio_areas, "none"))), digits = 2,
       caption = "Pairwise t-statistics by LIO for PAHs.")
