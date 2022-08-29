@@ -12,8 +12,6 @@ author:
   correspondence: yes
 subtitle: \textit{Draft Report}
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     highlight: haddock
     fig_caption: yes
@@ -21,6 +19,8 @@ output:
     pandoc_args:
     - --lua-filter=scholarly-metadata.lua
     - --lua-filter=author-info-blocks.lua
+  html_document:
+    df_print: paged
 institute:
 - qerm: Quantitative Ecology and Resource Management, University of Washington, Seattle,
     WA
@@ -166,17 +166,17 @@ We used the dry weights of toxics found in each sample for analysis. Although th
 Samples from the original aquaculture source used as reference materials were removed from the analyses, but included in the concentration maps. Samples outside of Puget Sound (east of -123.5 longitude) were also removed from sampling, but remain in map figures. Figures \ref{fig:PAmap}, \ref{fig:PBmap}, and \ref{fig:PCmap} display the concentrations of PAHs, PBDEs, and PCBs over time in mussel samples, respectively. They also shed light on how sampling is inconsistent both spatially and temporally. 
 
 
-```{r PAmap, fig.cap = "\\label{fig:PAmap}Estimated concentration of PAHs across Puget Sound."}
+```{r PAmap, fig.cap = "\\label{fig:PAmap}Estimated concentration of PAHs across Puget Sound.",out.width = "500px"}
 # knitr::include_graphics(here("outputs","PAHmaps_short_legend.pdf"))
 knitr::include_graphics(here("outputs","PAH_map.png"))
 ```
 
-```{r PBmap, fig.cap = "\\label{fig:PBmap}Estimated concentration of PBDEs across Puget Sound."}
+```{r PBmap, fig.cap = "\\label{fig:PBmap}Estimated concentration of PBDEs across Puget Sound.",out.width = "500px"}
 # knitr::include_graphics(here("outputs","PBDEmaps.pdf"))
 knitr::include_graphics(here("outputs","PBDE_map.png"))
 ```
 
-```{r PCMap, fig.cap = "\\label{fig:PCmap}Estimated concentration of PCBs across Puget Sound."}
+```{r PCMap, fig.cap = "\\label{fig:PCmap}Estimated concentration of PCBs across Puget Sound.",out.width = "500px"}
 # knitr::include_graphics(here(outputs,"PCBmaps.pdf"))
 knitr::include_graphics(here(outputs,"PCB_map.png"))
 ```
@@ -330,31 +330,25 @@ We acknowledge the help and support from the environmental toxicology group at W
 # Appendix
 
 
-## Pairwise t-test tables
-
-```{r param_summary_tables2}
-
-kable(tidy((pairwise.t.test(PA_df$dry_value, PA_df$wria_nr, "none"))), digits = 2,
-      caption = "Pairwise t-statistics by WRIA for PAHs.")
-
-kable(tidy((pairwise.t.test(PB_df$dry_value, PB_df$wria_nr, "none"))), digits = 2,
-      caption = "Pairwise t-statistics by WRIA for PBDEs.")
-
-kable(tidy((pairwise.t.test(PC_df$dry_value, PC_df$wria_nr, "none"))), digits = 2,
-      caption = "Pairwise t-statistics by WRIA for PCBs.")
-
-```
+## Tukey's Test tables
 
 ```{r param_summary_tables3}
 
-kable(tidy((pairwise.t.test(PA_df$dry_value, PA_df$lio_areas, "none"))), digits = 2,
-      caption = "Pairwise t-statistics by LIO for PAHs.")
+aA <- aov(dry_value ~ lio_areas, data = PA_df)
 
-kable(tidy((pairwise.t.test(PB_df$dry_value, PB_df$lio_areas, "none"))), digits = 2,
-      caption = "Pairwise t-statistics by LIO for PBDEs.")
+aB <- aov(dry_value ~ lio_areas, data = PB_df)
 
-kable(tidy((pairwise.t.test(PC_df$dry_value, PC_df$lio_areas, "none"))), digits = 2,
-      caption = "Pairwise t-statistics by LIO for PCBs.")
+aC <- aov(dry_value ~ lio_areas, data = PC_df)
+
+kable(tidy((TukeyHSD(aA, conf.level=.95))), digits = 2,
+      caption = "Pairwise Tukey's test statistics by LIO for PAHs.")
+
+kable(tidy((TukeyHSD(aB, conf.level=.95))), digits = 2,
+      caption = "Pairwise Tukey's test statistics by LIO for PBDEs.")
+
+
+kable(tidy((TukeyHSD(aC, conf.level=.95))), digits = 2,
+      caption = "Pairwise Tukey's test statistics by LIO for PCBs.")
 
 ```
 
@@ -362,13 +356,13 @@ kable(tidy((pairwise.t.test(PC_df$dry_value, PC_df$lio_areas, "none"))), digits 
 
 ```{r param_summary_tables}
 
-kable(tidy(PA_LMM), digits = 2,
+kable(tidy(PA_lm), digits = 2,
       caption = "Parameter estimates, associated standard errors, and t-statistics for the model of PAHs.")
 
-kable(tidy(PB_LMM), digits = 2,
+kable(tidy(PB_lm), digits = 2,
       caption = "Parameter estimates, associated standard errors, and t-statistics for the model of PBDEs.")
 
-kable(tidy(PC_LMM), digits = 2,
+kable(tidy(PC_lm), digits = 2,
       caption = "Parameter estimates, associated standard errors, and t-statistics for the model of PCBs.")
 
 ```
